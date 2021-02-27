@@ -1,14 +1,15 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-//import java.nio.file.Path;
-import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
 //import java.util.HashMap;
+import java.util.List;
 //import java.util.Map;
 import java.util.ArrayList;
+//import java.util.stream.Stream;
 
 // Charles Sy
 
@@ -50,14 +51,30 @@ public class Driver {
 						invertedIndex.add(word, map.getString("-text"), counter);
 						counter++;
 					}
-//					System.out.println(arrayList);
 				} catch (IOException e) {
 					System.out.println("Error in opening file.");
 				}
 			}
 			//check if path is a directory
 			else if (Files.isDirectory(map.getPath("-text"))) {
-				
+				try {
+					//list all text files
+					List<Path> textFiles = TextFileFinder.list(map.getPath("-text"));
+					for (Path file : textFiles) {
+						//open file for reading
+						try (BufferedReader br = Files.newBufferedReader(file)) {
+							//reads then stem words from file and store in a list
+							ArrayList<String> words = TextFileStemmer.listStems(map.getPath("-text"));
+							int counter = 1; //start at index 1
+							for (String word : words) {
+								invertedIndex.add(word, map.getString("-text"), counter);
+								counter++;
+							}
+						}
+					}
+				} catch (IOException e) {
+					System.out.println("Error in opening file.");
+				}
 			}
 
 		}
