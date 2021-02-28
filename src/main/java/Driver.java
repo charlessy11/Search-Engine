@@ -1,15 +1,9 @@
-//import java.io.BufferedReader;
-//import java.io.FileReader;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
-//import java.util.HashMap;
-import java.util.List;
-//import java.util.Map;
-import java.util.ArrayList;
-//import java.util.stream.Stream;
+
 
 // Charles Sy
 
@@ -38,53 +32,44 @@ public class Driver {
 		ArgumentMap map = new ArgumentMap(args); //parses command-line arguments
 		//build inverted index
 		InvertedIndex invertedIndex = new InvertedIndex();
-		//check for -text path 
+		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
 			//check if path is a regular file
 			if (Files.isRegularFile(map.getPath("-text"))) {
-				//open file
-//				try (BufferedReader br = new BufferedReader(new FileReader(map.getString("-text")))) {
-					//reads then stem words from file and store in a list
-					try {
-						ArrayList<String> words = TextFileStemmer.listStems(map.getPath("-text"));
-						int counter = 1; //start at index 1
-						for (String word : words) {
-							invertedIndex.add(word, map.getString("-text"), counter);
-							counter++;
-						}	
-					} catch (IOException e) {
-						System.out.println("Error in opening file.");
-					}
-//				} catch (IOException e) {
-//					System.out.println("Error in opening file.");
-//				}
+				try {
+					int position = 1; //position start at index 1
+					//get each stemmed and cleaned word from list
+					for (String word : TextFileStemmer.listStems(map.getPath("-text"))) {
+						//add word, location, and position to inverted index
+						invertedIndex.add(word, map.getString("-text"), position);
+						position++; //increment position
+					}	
+				} catch (IOException e) {
+					System.out.println("Error in opening file.");
+				}
 			}
 			//check if path is a directory
 			else if (Files.isDirectory(map.getPath("-text"))) {
 				try {
-					//list all text files
-					List<Path> textFiles = TextFileFinder.list(map.getPath("-text"));
-					for (Path file : textFiles) {
-						//open file for reading
-//						try (BufferedReader br = Files.newBufferedReader(file)) {
-							//reads then stem words from file and store in a list
-							ArrayList<String> words = TextFileStemmer.listStems(file);
-							int counter = 1; //start at index 1
-							for (String word : words) {
-								invertedIndex.add(word, file.toString(), counter);
-								counter++;
-							}
-//						}
+					//get each file from list of text files
+					for (Path file : TextFileFinder.list(map.getPath("-text"))) {
+						int position = 1; //position start at index 1
+						//get each stemmed and cleaned word from list
+						for (String word : TextFileStemmer.listStems(file)) {
+							//add word, location, and position to inverted index
+							invertedIndex.add(word, file.toString(), position);
+							position++; //increment position
+						}
 					}
 				} catch (IOException e) {
 					System.out.println("Error in opening file.");
 				}
 			}
-
 		}
+		//check for optional flag
 		if (map.hasFlag("-index")) {
-			//use given path or index.json as the default output path to print inverted index as JSON
 			try {
+				//use given path (or index.json as the default output path) to print inverted index as JSON
 				SimpleJsonWriter.asInvertedIndex(invertedIndex, map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error writing to file.");
