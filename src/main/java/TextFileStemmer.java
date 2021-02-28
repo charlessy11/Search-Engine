@@ -71,7 +71,7 @@ public class TextFileStemmer {
 	 * @see TextParser#parse(String)
 	 */
 	public static ArrayList<String> listStems(Path inputFile) throws IOException {
-		//read file
+		//open file for reading
 		try (BufferedReader read = Files.newBufferedReader(inputFile, StandardCharsets.UTF_8);) {
 			//create arrayList
 			ArrayList<String> list = new ArrayList<>();

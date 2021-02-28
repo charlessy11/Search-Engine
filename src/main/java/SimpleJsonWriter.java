@@ -256,7 +256,7 @@ public class SimpleJsonWriter {
 		}
 	}
 	
-	public static void asInvertedIndex (InvertedIndex elements, Path path) throws IOException {
+	public static void asInvertedIndex(InvertedIndex elements, Path path) throws IOException {
 		try (
 				BufferedWriter writer = Files.newBufferedWriter(path,
 						StandardCharsets.UTF_8)
