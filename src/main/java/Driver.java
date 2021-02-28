@@ -71,7 +71,7 @@ public class Driver {
 							ArrayList<String> words = TextFileStemmer.listStems(file);
 							int counter = 1; //start at index 1
 							for (String word : words) {
-								invertedIndex.add(word, map.getString("-text"), counter);
+								invertedIndex.add(word, file.toString(), counter);
 								counter++;
 							}
 //						}
