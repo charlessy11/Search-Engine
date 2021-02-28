@@ -64,7 +64,7 @@ public class Driver {
 						//open file for reading
 						try (BufferedReader br = Files.newBufferedReader(file)) {
 							//reads then stem words from file and store in a list
-							ArrayList<String> words = TextFileStemmer.listStems(map.getPath("-text"));
+							ArrayList<String> words = TextFileStemmer.listStems(file);
 							int counter = 1; //start at index 1
 							for (String word : words) {
 								invertedIndex.add(word, map.getString("-text"), counter);
