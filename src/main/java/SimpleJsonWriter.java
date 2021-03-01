@@ -282,7 +282,6 @@ public class SimpleJsonWriter {
 	 * @param elements the elements to use
 	 * @return a {@link String} containing the elements in pretty JSON format
 	 *
-	 * @see #asInvertedIndex(Map, Writer, int)
 	 */
 	public static String asInvertedIndex (InvertedIndex elements) {
 		try {
