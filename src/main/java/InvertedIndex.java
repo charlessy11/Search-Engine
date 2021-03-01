@@ -5,6 +5,13 @@ import java.util.TreeSet;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * A nested inverted index to store words, the locations the words were found in, 
+ * and the positions in the locations where the words were found in.
+ * 
+ * @author Charles Sy
+ *
+ */
 public class InvertedIndex {
 	
 	/**
@@ -26,10 +33,10 @@ public class InvertedIndex {
 	 * @param location the location the word was found
 	 * @param position the position the word was found in the location
 	 */
-	public void add(String content, String location, Integer position) {
-		map.putIfAbsent(content, new TreeMap<>());
-		map.get(content).putIfAbsent(location, new TreeSet<>());
-		map.get(content).get(location).add(position); //adds index
+	public void add(String word, String location, Integer position) {
+		map.putIfAbsent(word, new TreeMap<>());
+		map.get(word).putIfAbsent(location, new TreeSet<>());
+		map.get(word).get(location).add(position);
 	}
 	/**
 	 * Returns the number of words stored in the index.
@@ -101,8 +108,8 @@ public class InvertedIndex {
 	 * @param position the position in that location where the word was found to lookup
 	 * @return {@true} if the location and word is stored in the index
 	 */
-	public boolean contains(String content, String location, Integer position) {
-		if (map.containsKey(content) && map.get(content).containsKey(location) && map.get(content).get(location).contains(position)) {
+	public boolean contains(String word, String location, Integer position) {
+		if (map.containsKey(word) && map.get(word).containsKey(location) && map.get(word).get(location).contains(position)) {
 			return true;
 		}
 		return false;
@@ -127,9 +134,9 @@ public class InvertedIndex {
 	 * @return an unmodifiable view of the locations stored for the word
 	 * @see Collections#unmodifiableCollection(Collection)
 	 */
-	public Collection<String> get(String context) {
-		if (map.containsKey(context)) {
-			return Collections.unmodifiableCollection(map.get(context).keySet());
+	public Collection<String> get(String word) {
+		if (map.containsKey(word)) {
+			return Collections.unmodifiableCollection(map.get(word).keySet());
 		}
 		return Collections.emptySet();
 	}

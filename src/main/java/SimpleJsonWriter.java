@@ -117,6 +117,14 @@ public class SimpleJsonWriter {
 		writer.write('}');
 	}
 	
+	/**
+	 * Writes the elements as a pretty JSON object with a nested inverted index.
+	 * 
+	 * @param elements the elements to write
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
+	 */
 	public static void asInvertedIndex(InvertedIndex elements, Writer writer,
 			int level) throws IOException {
 		writer.write('{');
@@ -193,6 +201,22 @@ public class SimpleJsonWriter {
 			asNestedArray(elements, writer, 0);
 		}
 	}
+	
+	/**
+	 * Writes the elements as as a nested pretty JSON inverted index to file.
+	 * 
+	 * @param elements the elements to write
+	 * @param path the file path to use
+	 * @throws IOException if an IO error occurs
+	 */
+	public static void asInvertedIndex(InvertedIndex elements, Path path) throws IOException {
+		try (
+				BufferedWriter writer = Files.newBufferedWriter(path,
+						StandardCharsets.UTF_8)
+		) {
+			asInvertedIndex(elements, writer, 0);
+		}	
+	}
 
 	/**
 	 * Returns the elements as a pretty JSON array.
@@ -252,15 +276,25 @@ public class SimpleJsonWriter {
 		}
 	}
 	
-	public static void asInvertedIndex(InvertedIndex elements, Path path) throws IOException {
-		try (
-				BufferedWriter writer = Files.newBufferedWriter(path,
-						StandardCharsets.UTF_8)
-		) {
+	/**
+	 * Returns the elements as a nested pretty JSON inverted index.
+	 *
+	 * @param elements the elements to use
+	 * @return a {@link String} containing the elements in pretty JSON format
+	 *
+	 * @see #asInvertedIndex(Map, Writer, int)
+	 */
+	public static String asInvertedIndex (InvertedIndex elements) {
+		try {
+			StringWriter writer = new StringWriter();
 			asInvertedIndex(elements, writer, 0);
-		}	
+			return writer.toString();
+		}
+		catch (IOException e) {
+			return null;
+		}
 	}
-
+	
 	/**
 	 * Indents and then writes the String element.
 	 *
