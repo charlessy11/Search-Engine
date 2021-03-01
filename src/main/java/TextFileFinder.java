@@ -77,17 +77,4 @@ public class TextFileFinder {
 				.collect(Collectors.toList());
 		return textFiles;
 	}
-
-	/**
-	 * Demonstrates this class.
-	 * 
-	 * @param args unused
-	 * @throws IOException if unable to list path
-	 */
-	public static void main(String[] args) throws IOException {
-		// TODO Modify and/or remove as necessary for debugging
-		Path path = Path.of("src", "test", "resources", "text");
-		System.out.println(Files.isDirectory(path));
-		System.out.println(list(path));
-	}
 }

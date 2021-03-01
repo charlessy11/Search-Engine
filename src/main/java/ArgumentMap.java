@@ -220,30 +220,4 @@ public class ArgumentMap {
 	public String toString() {
 		return this.map.toString();
 	}
-
-	/**
-	 * Demonstrates this class.
-	 *
-	 * @param args the command-line arguments to parse
-	 */
-	public static void main(String[] args) {
-		if (args.length < 1) {
-			// demonstrate with a hard-coded example
-			args = new String[] { 
-					"-a", "ant", "-b", "bee", "-b", "bat", "cat", 
-					"-d", "-e", "elk", "-f" };
-
-			// create and output initial map
-			var map = new ArgumentMap(args);
-			System.out.println(map);
-
-			// demonstrate how parsing modifies existing map
-			map.parse(new String[] { "-d", "dog", "-ü", "-3", "-4" });
-			System.out.println(map);
-		}
-		else {
-			// output the argument map for the provided args
-			System.out.println(new ArgumentMap(args));
-		}
-	}
-}
+}	

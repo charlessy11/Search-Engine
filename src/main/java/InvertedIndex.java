@@ -8,7 +8,7 @@ import java.util.Set;
 public class InvertedIndex {
 	
 	/**
-	 * Multiple-leveled nested HashMap that serves as an inverted index
+	 * Multiple-leveled nested TreeMap that serves as an inverted index
 	 */
 	public final Map <String, Map<String, Set<Integer>>> map;
 	
@@ -20,11 +20,11 @@ public class InvertedIndex {
 	}
 	
 	/**
-	 * Adds the content, word, and index.
+	 * Adds the word, location, and position.
 	 *
-	 * @param content the content found
+	 * @param word the word found
 	 * @param location the location the word was found
-	 * @param position the position the content is found
+	 * @param position the position the word was found in the location
 	 */
 	public void add(String content, String location, Integer position) {
 		map.putIfAbsent(content, new TreeMap<>());
@@ -32,7 +32,7 @@ public class InvertedIndex {
 		map.get(content).get(location).add(position); //adds index
 	}
 	/**
-	 * Returns the number of contents stored in the index.
+	 * Returns the number of words stored in the index.
 	 *
 	 * @return 0 if the index is empty, otherwise the number of contents in the
 	 *         index
@@ -42,63 +42,63 @@ public class InvertedIndex {
 	}
 	
 	/**
-	 * Returns the number of locations the content is found in.
+	 * Returns the number of locations the word was found in.
 	 *
-	 * @param content the content to lookup
+	 * @param word the word to lookup
 	 * @return 0 if the location is not in the index or has no words, otherwise
 	 *         the number of words stored for that element
 	 */
-	public int size(String content) {
-		return map.get(content).size();
+	public int size(String word) {
+		return map.get(word).size();
 	}
 	
 	/**
-	 * Returns the number of indices found from the location the content is found in.
+	 * Returns the number of positions found from the location the word was found in.
 	 *
-	 * @param content the content to lookup
+	 * @param word the word to lookup
 	 * @param location the location to lookup
 	 * @return 0 if the location is not in the index or has no words, otherwise
 	 *         the number of words stored for that element
 	 */
-	public int size(String content, String location) {
-		return map.get(content).get(location).size();
+	public int size(String word, String location) {
+		return map.get(word).get(location).size();
 	}
 	
 	/**
-	 * Determines whether the content is stored in the index.
+	 * Determines whether the word is stored in the index.
 	 *
-	 * @param content the content to lookup
+	 * @param word the word to lookup
 	 * @return {@true} if the location is stored in the index
 	 */
-	public boolean contains(String content) {
-		if (map.containsKey(content)) {
+	public boolean contains(String word) {
+		if (map.containsKey(word)) {
 			return true;
 		}
 		return false;
 	}
 	
 	/**
-	 * Determines whether the content is stored in the index and the location is
-	 * stored for that content.
+	 * Determines whether the word is stored in the index and the location is
+	 * stored for that word.
 	 *
-	 * @param content the content to lookup
-	 * @param location the location in that content to lookup
+	 * @param word the word to lookup
+	 * @param location the location in that word to lookup
 	 * @return {@true} if the location and word is stored in the index
 	 */
-	public boolean contains(String content, String location) {
-		if (map.containsKey(content) && map.get(content).containsKey(location)) {
+	public boolean contains(String word, String location) {
+		if (map.containsKey(word) && map.get(word).containsKey(location)) {
 			return true;
 		}
 		return false;
 	}
 	
 	/**
-	 * Determines whether the content is stored in the index, the location is
-	 * stored for that content, and the position is stored for that location
+	 * Determines whether the word is stored in the index, the location is
+	 * stored for that word, and the position is stored for that location
 	 *
-	 * @param content the content to lookup
-	 * @param location the location in that content to lookup
-	 * @param position the position in that location where the content is found to lookup
+	 * @param word the word to lookup
+	 * @param location the location in that word to lookup
+	 * @param position the position in that location where the word was found to lookup
 	 * @return {@true} if the location and word is stored in the index
 	 */
 	public boolean contains(String content, String location, Integer position) {
@@ -109,9 +109,9 @@ public class InvertedIndex {
 	}
 	
 	/**
-	 * Returns an unmodifiable view of the contents stored in the index.
+	 * Returns an unmodifiable view of the words stored in the index.
 	 *
-	 * @return an unmodifiable view of the contents stored in the index
+	 * @return an unmodifiable view of the words stored in the index
 	 * @see Collections#unmodifiableCollection(Collection)
 	 */
 	public Collection<String> get() {
@@ -120,11 +120,11 @@ public class InvertedIndex {
 	
 	/**
 	 * Returns an unmodifiable view of the locations stored in the index for the
-	 * provided content, or an empty collection if the content is not in the
+	 * provided word, or an empty collection if the word is not in the
 	 * index.
 	 *
-	 * @param content the content to lookup
-	 * @return an unmodifiable view of the location stored for the content
+	 * @param word the word to lookup
+	 * @return an unmodifiable view of the locations stored for the word
 	 * @see Collections#unmodifiableCollection(Collection)
 	 */
 	public Collection<String> get(String context) {
@@ -136,17 +136,17 @@ public class InvertedIndex {
 	
 	/**
 	 * Returns an unmodifiable view of the positions stored in the index for the
-	 * provided location where the content is found, or an empty collection if the content is not in the
+	 * provided location where the word is found, or an empty collection if the word is not in the
 	 * index.
 	 *
-	 * @param content the content to lookup
+	 * @param word the word to lookup
 	 * @param location the location to lookup
-	 * @return an unmodifiable view of the location stored for the content
+	 * @return an unmodifiable view of the positions stored for the locations the word is found in
 	 * @see Collections#unmodifiableCollection(Collection)
 	 */
-	public Collection<Integer> get(String context, String location) {
-		if (map.get(context).containsKey(location)) {
-			return Collections.unmodifiableCollection(map.get(context).get(location));
+	public Collection<Integer> get(String word, String location) {
+		if (map.get(word).containsKey(location)) {
+			return Collections.unmodifiableCollection(map.get(word).get(location));
 		}
 		return Collections.emptySet();
 	}
@@ -155,5 +155,4 @@ public class InvertedIndex {
 	public String toString() {
 		return this.map.toString();
 	}
-	
 }

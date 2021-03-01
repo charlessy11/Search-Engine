@@ -4,9 +4,6 @@ import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
 
-
-// Charles Sy
-
 /**
  * Class responsible for running this project based on the provided command-line
  * arguments. See the README for details.

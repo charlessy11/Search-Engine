@@ -139,7 +139,7 @@ public class TextFileStemmer {
 	 * @see TextParser#parse(String)
 	 */
 	public static TreeSet<String> uniqueStems(Path inputFile) throws IOException {
-		//read file
+		//open file for reading
 		try (BufferedReader read = Files.newBufferedReader(inputFile, StandardCharsets.UTF_8);) {
 			//create treeSet
 			TreeSet<String> set = new TreeSet<>();
@@ -154,26 +154,5 @@ public class TextFileStemmer {
 			}
 			return set;
 		}
-	}
-
-	/**
-	 * Demonstrates this class.
-	 *
-	 * @param args unused
-	 * @throws IOException if an I/O error occurs
-	 */
-	public static void main(String[] args) throws IOException {
-		String text = """
-				practic practical practice practiced practicer practices
-				practicing practis practisants practise practised practiser
-				practisers practises practising practitioner practitioners
-				""";
-
-		System.out.println(listStems(text));
-		System.out.println(uniqueStems(text));
-
-		Path base = Path.of("src", "test", "resources");
-		System.out.println(listStems(base.resolve("words.tExT")));
-		System.out.println(uniqueStems(base.resolve("symbols.txt")));
 	}
 }
