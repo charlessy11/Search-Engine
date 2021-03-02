@@ -19,7 +19,7 @@ public class ArgumentMap {
 	 * Initializes this argument map.
 	 */
 	public ArgumentMap() {
-		this.map = new HashMap<String,String>(); // TODO Initialize data structure
+		this.map = new HashMap<String,String>();
 	}
 
 	/**
