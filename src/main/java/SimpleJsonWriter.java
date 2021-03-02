@@ -33,6 +33,8 @@ public class SimpleJsonWriter {
 		writer.write('[');
 		writer.write('\n');
 		
+		// TODO Possible to do this without an if statement inside the loop
+		
 		int counter = 0;
 		for (Integer element : elements) {
 			indent(element.toString(), writer, 1);

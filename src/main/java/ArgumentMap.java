@@ -19,7 +19,7 @@ public class ArgumentMap {
 	 * Initializes this argument map.
 	 */
 	public ArgumentMap() {
-		this.map = new HashMap<String,String>();
+		this.map = new HashMap<String, String>();
 	}
 
 	/**
@@ -45,8 +45,8 @@ public class ArgumentMap {
 		for (int i = 0; i < args.length; i++) {
 			if (isFlag(args[i])) {
 				map.put(args[i], null);
-				if (i+1 < args.length && isValue(args[i+1])) {
-					map.put(args[i], args[i+1]);
+				if (i + 1 < args.length && isValue(args[i + 1])) {
+					map.put(args[i], args[i + 1]);
 					++i;
 				}
 			}
@@ -69,6 +69,10 @@ public class ArgumentMap {
 		if (arg == null) {
 			return false;
 		}
+		
+		// TODO Simplify any method that has an if/else with a true/false return statement
+		// TODO return (arg.startsWith("-") && arg.length() >= 2 && Character.isLetter(arg.codePointAt(1)));
+		
 		else if (arg.startsWith("-") && arg.length() >= 2 && Character.isLetter(arg.codePointAt(1))) {
 			return true;
 		}
@@ -211,7 +215,8 @@ public class ArgumentMap {
 				return Integer.parseInt(map.get(flag));
 			}
 		} catch(NumberFormatException e) {
-			System.err.println("Error.");
+			System.err.println("Error."); // TODO Remove
+			// TODO return default? 
 		}
 		return defaultValue;
 	}
