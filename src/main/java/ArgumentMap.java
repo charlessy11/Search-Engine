@@ -69,14 +69,7 @@ public class ArgumentMap {
 		if (arg == null) {
 			return false;
 		}
-		
-		// TODO Simplify any method that has an if/else with a true/false return statement
-		// TODO return (arg.startsWith("-") && arg.length() >= 2 && Character.isLetter(arg.codePointAt(1)));
-		
-		else if (arg.startsWith("-") && arg.length() >= 2 && Character.isLetter(arg.codePointAt(1))) {
-			return true;
-		}
-		return false;
+		return (arg.startsWith("-") && arg.length() >= 2 && Character.isLetter(arg.codePointAt(1)));
 	}
 
 	/**

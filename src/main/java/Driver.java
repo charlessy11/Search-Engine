@@ -30,12 +30,10 @@ public class Driver {
 		//build inverted index
 		InvertedIndex invertedIndex = new InvertedIndex();
 		
-		// TODO -text flag without value? ---> warn the user
+		// TODO Move some of the building logic into another class (InvertedIndexBuilder or InvertedIndexFactory)
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
-			// TODO Move some of the building logic into another class (InvertedIndexBuilder or InvertedIndexFactory)
-			
 			//check if path is a regular file
 			if (Files.isRegularFile(map.getPath("-text"))) {
 				try {
@@ -47,7 +45,7 @@ public class Driver {
 						position++; //increment position
 					}	
 				} catch (IOException e) {
-					System.out.println("Error in opening file.");
+					System.out.println("Error: Unable to open file.");
 				}
 			}
 			//check if path is a directory
@@ -64,9 +62,12 @@ public class Driver {
 						}
 					}
 				} catch (IOException e) {
-					System.out.println("Error in opening file.");
+					System.out.println("Error: Unable to open file.");
 				}
 			}
+		}
+		if (map.hasFlag("-text") && !map.hasValue("-text")) {
+			System.out.println("Warning: No value given to -text flag");
 		}
 		
 		//check for optional flag
@@ -76,7 +77,7 @@ public class Driver {
 				SimpleJsonWriter.asInvertedIndex(invertedIndex, map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				// TODO Unable to write the inverted index to file: + path.toString()
-				System.out.println("Error writing to file.");
+				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
 			}
 		}
 		
