@@ -29,8 +29,13 @@ public class Driver {
 		ArgumentMap map = new ArgumentMap(args); //parses command-line arguments
 		//build inverted index
 		InvertedIndex invertedIndex = new InvertedIndex();
+		
+		// TODO -text flag without value? ---> warn the user
+		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
+			// TODO Move some of the building logic into another class (InvertedIndexBuilder or InvertedIndexFactory)
+			
 			//check if path is a regular file
 			if (Files.isRegularFile(map.getPath("-text"))) {
 				try {
@@ -63,12 +68,14 @@ public class Driver {
 				}
 			}
 		}
+		
 		//check for optional flag
 		if (map.hasFlag("-index")) {
 			try {
 				//use given path (or index.json as the default output path) to print inverted index as JSON
 				SimpleJsonWriter.asInvertedIndex(invertedIndex, map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
+				// TODO Unable to write the inverted index to file: + path.toString()
 				System.out.println("Error writing to file.");
 			}
 		}
