@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.nio.file.Path;
-import java.nio.file.Files;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -32,24 +31,9 @@ public class Driver {
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
-			//check if path is a regular file
-			if (Files.isRegularFile(map.getPath("-text"))) {
-				try {
-					InvertedIndexBuilder.addInfo_ifRegularFile(invertedIndex, map.getPath("-text"));
-				} catch (IOException e) {
-					System.out.println("Error: Unable to open file.");
-				}
-			}
-			//check if path is a directory
-			else if (Files.isDirectory(map.getPath("-text"))) {
-				try {
-					InvertedIndexBuilder.addInfo_ifDirectory(invertedIndex,  map.getPath("-text"));
-				} catch (IOException e) {
-					System.out.println("Error: Unable to open file.");
-				}
-			}
+			InvertedIndexBuilder.add(invertedIndex, map.getPath("-text"));
 		}
-		if (map.hasFlag("-text") && !map.hasValue("-text")) {
+		else if (map.hasFlag("-text") && !map.hasValue("-text")) {
 			System.out.println("Warning: No value given to -text flag");
 		}
 		
