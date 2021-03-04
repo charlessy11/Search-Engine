@@ -30,20 +30,12 @@ public class Driver {
 		//build inverted index
 		InvertedIndex invertedIndex = new InvertedIndex();
 		
-		// TODO Move some of the building logic into another class (InvertedIndexBuilder or InvertedIndexFactory)
-		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
 			//check if path is a regular file
 			if (Files.isRegularFile(map.getPath("-text"))) {
 				try {
-					int position = 1; //position start at index 1
-					//get each stemmed and cleaned word from list
-					for (String word : TextFileStemmer.listStems(map.getPath("-text"))) {
-						//add word, location, and position to inverted index
-						invertedIndex.add(word, map.getString("-text"), position);
-						position++; //increment position
-					}	
+					InvertedIndexBuilder.addInfo_ifRegularFile(invertedIndex, map.getPath("-text"));
 				} catch (IOException e) {
 					System.out.println("Error: Unable to open file.");
 				}
@@ -51,16 +43,7 @@ public class Driver {
 			//check if path is a directory
 			else if (Files.isDirectory(map.getPath("-text"))) {
 				try {
-					//get each file from list of text files
-					for (Path file : TextFileFinder.list(map.getPath("-text"))) {
-						int position = 1; //position start at index 1
-						//get each stemmed and cleaned word from list
-						for (String word : TextFileStemmer.listStems(file)) {
-							//add word, location, and position to inverted index
-							invertedIndex.add(word, file.toString(), position);
-							position++; //increment position
-						}
-					}
+					InvertedIndexBuilder.addInfo_ifDirectory(invertedIndex,  map.getPath("-text"));
 				} catch (IOException e) {
 					System.out.println("Error: Unable to open file.");
 				}
