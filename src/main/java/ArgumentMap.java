@@ -203,13 +203,8 @@ public class ArgumentMap {
 	 *         value if there is no valid mapping
 	 */
 	public int getInteger(String flag, int defaultValue) {
-		try {
-			if (hasValue(flag)) {
-				return Integer.parseInt(map.get(flag));
-			}
-		} catch(NumberFormatException e) {
-			System.err.println("Error."); // TODO Remove
-			// TODO return default? 
+		if (hasValue(flag)) {
+			return Integer.parseInt(map.get(flag));
 		}
 		return defaultValue;
 	}
