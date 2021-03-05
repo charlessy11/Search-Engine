@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
@@ -31,20 +32,24 @@ public class SimpleJsonWriter {
 	 */
 	public static void asArray(Collection<Integer> elements, Writer writer,
 			int level) throws IOException {
-		writer.write('[');
-		writer.write('\n');
+		if (elements.isEmpty()) {
+			writer.write("[\n]");
+		}
+		else {
+			writer.write('[');
+			writer.write('\n');	
 		
-		Iterator<Integer> iterator = elements.iterator(); //get first element(special case)
-		indent(iterator.next().toString(), writer, 1);
-		for (Integer element : elements) {
-			while (element != null) {
+			Iterator<Integer> iterator = elements.iterator();
+
+			indent(iterator.next().toString(), writer, 1);
+			while (iterator.hasNext()) {
 				writer.write(',');
 				writer.write('\n');
-				indent(element.toString(), writer, 1);
+				indent(iterator.next().toString(), writer, 1);
 			}
 			writer.write('\n');
+			writer.write(']');
 		}
-		writer.write(']');
 	}
 
 	/**
@@ -57,24 +62,32 @@ public class SimpleJsonWriter {
 	 */
 	public static void asObject(Map<String, Integer> elements, Writer writer,
 			int level) throws IOException {
-		writer.write('{');
-		writer.write('\n');
-		
-//		Iterator<Integer> iterator = elements.iterator(); //get first element(special case)
-//		indent(iterator.next().toString(), writer, 1);
-		
-//		int counter = 0;
-		for (String key : elements.keySet()) {
-			quote(key, writer, 1);
-			writer.write(": ");
-			writer.write(elements.get(key).toString());
-//			counter++;
-//			if (counter != elements.size()) {
-//				writer.write(',');
-//			}
-			writer.write('\n');
+		if (elements.isEmpty()) {
+			writer.write("{\n}");
 		}
-		writer.write('}');
+		else {
+			writer.write('{');
+			writer.write('\n');
+			
+			Iterator<Entry<String, Integer>> iterator = elements.entrySet().iterator();
+			
+			if (iterator.hasNext()) {
+				var entry1 = iterator.next();
+				quote(entry1.getKey(), writer, 1);
+				writer.write(": ");
+				writer.write(elements.get(entry1.getKey()).toString());
+				while (iterator.hasNext()) {
+					var entry2 = iterator.next();
+					writer.write(',');
+					writer.write('\n');
+					quote(entry2.getKey(), writer, 1);
+					writer.write(": ");
+					writer.write(elements.get(entry2.getKey()).toString());
+				}
+			}
+			writer.write('\n');
+			writer.write('}');
+		}
 	}
 
 	/**
