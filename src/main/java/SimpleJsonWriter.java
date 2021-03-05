@@ -6,6 +6,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -33,14 +34,13 @@ public class SimpleJsonWriter {
 		writer.write('[');
 		writer.write('\n');
 		
-		// TODO Possible to do this without an if statement inside the loop
-		
-		int counter = 0;
+		Iterator<Integer> iterator = elements.iterator(); //get first element(special case)
+		indent(iterator.next().toString(), writer, 1);
 		for (Integer element : elements) {
-			indent(element.toString(), writer, 1);
-			counter++;
-			if (counter != elements.size()) {
+			while (element != null) {
 				writer.write(',');
+				writer.write('\n');
+				indent(element.toString(), writer, 1);
 			}
 			writer.write('\n');
 		}
@@ -60,15 +60,18 @@ public class SimpleJsonWriter {
 		writer.write('{');
 		writer.write('\n');
 		
-		int counter = 0;
+//		Iterator<Integer> iterator = elements.iterator(); //get first element(special case)
+//		indent(iterator.next().toString(), writer, 1);
+		
+//		int counter = 0;
 		for (String key : elements.keySet()) {
 			quote(key, writer, 1);
 			writer.write(": ");
 			writer.write(elements.get(key).toString());
-			counter++;
-			if (counter != elements.size()) {
-				writer.write(',');
-			}
+//			counter++;
+//			if (counter != elements.size()) {
+//				writer.write(',');
+//			}
 			writer.write('\n');
 		}
 		writer.write('}');
