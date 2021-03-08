@@ -32,23 +32,21 @@ public class SimpleJsonWriter {
 	 */
 	public static void asArray(Collection<Integer> elements, Writer writer,
 			int level) throws IOException {
-		if (elements.isEmpty()) {
-			writer.write("[\n]");
-		}
-		else {
-			writer.write('[');
-			writer.write('\n');	
-		
+		writer.write('[');
+		writer.write('\n');
+		if (!elements.isEmpty()) {
 			Iterator<Integer> iterator = elements.iterator();
-
-			indent(iterator.next().toString(), writer, 1);
+			indent(iterator.next().toString(), writer, level + 1);
 			while (iterator.hasNext()) {
 				writer.write(',');
 				writer.write('\n');
-				indent(iterator.next().toString(), writer, 1);
+				indent(iterator.next().toString(), writer, level + 1);
 			}
 			writer.write('\n');
-			writer.write(']');
+			indent("]", writer, level);
+		}
+		else {
+			indent("]", writer, level);
 		}
 	}
 
@@ -62,30 +60,26 @@ public class SimpleJsonWriter {
 	 */
 	public static void asObject(Map<String, Integer> elements, Writer writer,
 			int level) throws IOException {
-		if (elements.isEmpty()) {
-			writer.write("{\n}");
-		}
-		else {
-			writer.write('{');
-			writer.write('\n');
-			
+		writer.write('{');
+		writer.write('\n');
+		if (!elements.isEmpty()) {
 			Iterator<Entry<String, Integer>> iterator = elements.entrySet().iterator();
-			
-			if (iterator.hasNext()) {
-				var entry1 = iterator.next();
-				quote(entry1.getKey(), writer, 1);
+			var entry1 = iterator.next();
+			quote(entry1.getKey(), writer, 1);
+			writer.write(": ");
+			writer.write(entry1.getValue().toString());
+			while (iterator.hasNext()) {
+				var entry2 = iterator.next();
+				writer.write(',');
+				writer.write('\n');
+				quote(entry2.getKey(), writer, 1);
 				writer.write(": ");
-				writer.write(elements.get(entry1.getKey()).toString());
-				while (iterator.hasNext()) {
-					var entry2 = iterator.next();
-					writer.write(',');
-					writer.write('\n');
-					quote(entry2.getKey(), writer, 1);
-					writer.write(": ");
-					writer.write(elements.get(entry2.getKey()).toString());
-				}
+				writer.write(entry2.getValue().toString());
 			}
 			writer.write('\n');
+			writer.write('}');
+		}
+		else {
 			writer.write('}');
 		}
 	}
@@ -105,34 +99,26 @@ public class SimpleJsonWriter {
 			int level) throws IOException {
 		writer.write('{');
 		writer.write('\n');
-		
-		int counter = 0;
-		for(var entry : elements.entrySet()) {
-			quote(entry.getKey(), writer, 2);
+		if (!elements.isEmpty()) {
+			var iterator = elements.entrySet().iterator();		
+			var entry1 = iterator.next();
+			quote(entry1.getKey(), writer, level);
 			writer.write(": ");
-			writer.write('[');
-			
-			int counter2 = 0;
-			for (Integer value : entry.getValue()) {
-				writer.write('\n');
-				indent(value.toString(), writer, 3);
-				counter2++;
-				if (counter2 != entry.getValue().size()) {
-					writer.write(',');
-				}
-			}
-			writer.write('\n');
-			writer.write('\t');
-			writer.write('\t');
-			writer.write(']');
-			counter++;
-			if (counter != elements.size()) {
+			SimpleJsonWriter.asArray(entry1.getValue(), writer, level);
+			while (iterator.hasNext()) {
+				var entry2 = iterator.next();
 				writer.write(',');
+				writer.write('\n');
+				quote(entry2.getKey(), writer, level);
+				writer.write(": ");
+				SimpleJsonWriter.asArray(entry2.getValue(), writer, level);
 			}
 			writer.write('\n');
+			indent("}", writer, 1);
 		}
-		writer.write('\t');
-		writer.write('}');
+		else {
+			writer.write('}');
+		}
 	}
 	
 	/**
@@ -147,19 +133,27 @@ public class SimpleJsonWriter {
 			int level) throws IOException {
 		writer.write('{');
 		writer.write('\n');
-		
-		int counter = 0; 
-		for (String text : elements.get()) {
-			quote(text, writer, 1);
+		int curr_size = 0;
+		if (curr_size != elements.size()) {
+			var iterator = elements.get().iterator();		
+			var entry1 = iterator.next();
+			quote(entry1, writer, 1);
 			writer.write(": ");
-			SimpleJsonWriter.asNestedArray(elements.map.get(text), writer, 0);
-			counter++;
-			if (counter != elements.size()) {
-				writer.write(',');	
+			SimpleJsonWriter.asNestedArray(elements.map.get(entry1), writer, 2);
+			while (iterator.hasNext()) {
+				var entry2 = iterator.next();
+				writer.write(',');
+				writer.write('\n');
+				quote(entry2, writer, 1);
+				writer.write(": ");
+				SimpleJsonWriter.asNestedArray(elements.map.get(entry2), writer, 2);
 			}
 			writer.write('\n');
+			writer.write('}');
 		}
-		writer.write('}');
+		else {
+			writer.write('}');
+		}
 	}
 
 	/**
