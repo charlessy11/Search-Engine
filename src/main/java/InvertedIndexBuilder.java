@@ -2,6 +2,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+/**
+ * Builds Inverted Index
+ * 
+ * @author jett
+ *
+ */
 public class InvertedIndexBuilder {
 	
 	/**
