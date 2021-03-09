@@ -43,7 +43,6 @@ public class Driver {
 				//use given path (or index.json as the default output path) to print inverted index as JSON
 				SimpleJsonWriter.asInvertedIndex(invertedIndex, map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
-				// TODO Unable to write the inverted index to file: + path.toString()
 				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
 			}
 		}
