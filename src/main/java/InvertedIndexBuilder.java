@@ -10,7 +10,6 @@ public class InvertedIndexBuilder {
 	 * 
 	 * @param invertedIndex the inverted index to add information into
 	 * @param path the path of the file
-	 * @throws IOException
 	 */
 	public static void add(InvertedIndex invertedIndex, Path path) {
 		//check if path is a regular file
