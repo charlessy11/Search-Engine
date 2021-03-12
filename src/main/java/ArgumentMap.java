@@ -99,7 +99,7 @@ public class ArgumentMap {
 	 * @return {@code true} if the flag exists
 	 */
 	public boolean hasFlag(String flag) {
-		if (map.containsKey(flag)) {
+		if (map.containsKey(flag)) { // TODO return map... 
 			return true;
 		}
 		return false;	
@@ -112,7 +112,7 @@ public class ArgumentMap {
 	 * @return {@code true} if the flag is mapped to a non-null value
 	 */
 	public boolean hasValue(String flag) {
-		if (map.get(flag) != null) {
+		if (map.get(flag) != null) { // TODO Single return map.get(flag) != null
 			return true;
 		}
 		return false;
@@ -128,7 +128,7 @@ public class ArgumentMap {
 	 */
 	public String getString(String flag) {
 		if (hasValue(flag)) {
-			return map.get(flag);
+			return map.get(flag); // TODO Only line you need
 		}
 		return null;
 	}

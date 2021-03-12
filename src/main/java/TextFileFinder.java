@@ -27,7 +27,9 @@ public class TextFileFinder {
 	 */
 	public static final Predicate<Path> IS_TEXT = p -> (p.toString().toLowerCase().endsWith(".txt") || 
 			p.toString().toLowerCase().endsWith(".text")) && Files.isRegularFile(p);
-
+	// TODO String lower = p.toString().toLowerCase();
+	// TODO Reuse lower in both endsWith tests... use { } in the lambda expression
+	
 	/**
 	 * If provided a directory, returns a stream of all text files within that
 	 * directory. Follows any symbolic links encountered. If provided a file,
@@ -46,6 +48,8 @@ public class TextFileFinder {
 		Stream<Path> textFiles = Files.walk(start, FileVisitOption.FOLLOW_LINKS)
 			.filter(keep);
 		return textFiles;
+		
+		// TODO return Files.walk(start, FileVisitOption.FOLLOW_LINKS).filter(keep);
 	}	
 
 	/**
@@ -75,6 +79,6 @@ public class TextFileFinder {
 	public static List<Path> list(Path start) throws IOException {
 		List<Path> textFiles = TextFileFinder.find(start)
 				.collect(Collectors.toList());
-		return textFiles;
+		return textFiles; // TODO Single return?
 	}
 }

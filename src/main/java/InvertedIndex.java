@@ -13,7 +13,7 @@ import java.util.Set;
  *
  */
 public class InvertedIndex {
-	
+	// TODO private
 	/**
 	 * Multiple-leveled nested TreeMap that serves as an inverted index
 	 */
@@ -56,7 +56,7 @@ public class InvertedIndex {
 	 *         the number of words stored for that element
 	 */
 	public int size(String word) {
-		return map.get(word).size();
+		return map.get(word).size(); // TODO null pointer issues!
 	}
 	
 	/**
@@ -68,7 +68,7 @@ public class InvertedIndex {
 	 *         the number of words stored for that element
 	 */
 	public int size(String word, String location) {
-		return map.get(word).get(location).size();
+		return map.get(word).get(location).size(); // TODO Avoid the null pointer exception
 	}
 	
 	/**
@@ -78,7 +78,7 @@ public class InvertedIndex {
 	 * @return {@true} if the location is stored in the index
 	 */
 	public boolean contains(String word) {
-		if (map.containsKey(word)) {
+		if (map.containsKey(word)) { // TODO single return
 			return true;
 		}
 		return false;
@@ -152,7 +152,7 @@ public class InvertedIndex {
 	 * @see Collections#unmodifiableCollection(Collection)
 	 */
 	public Collection<Integer> get(String word, String location) {
-		if (map.get(word).containsKey(location)) {
+		if (map.get(word).containsKey(location)) { // TODO Use your own contains method
 			return Collections.unmodifiableCollection(map.get(word).get(location));
 		}
 		return Collections.emptySet();
@@ -162,4 +162,7 @@ public class InvertedIndex {
 	public String toString() {
 		return this.map.toString();
 	}
+	
+	// TODO Add a toJson(Path path) methods here that calls SimpleJsonWriter
+	// TODO Driver calls InvertedIndex.toJson which calls SimpleJsonWriter.asInvertedIndex
 }
