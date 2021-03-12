@@ -40,10 +40,19 @@ public class TextFileStemmer {
 		String[] parsed = TextParser.parse(line);
 		//adds cleaned and stemmed parsed words into arrayList
 		for (String word : parsed) {
-			list.add((String) stemmer.stem(word));
+			list.add((String) stemmer.stem(word)); // TODO Don't downcast... use toString
 		}
 		return list;
 	}
+	
+	/* TODO 
+	public static void stemLine(String line, Stemmer stemmer, Collection<String> stems) {
+		String[] parsed = TextParser.parse(line);
+		for (String word : parsed) {
+			stems.add(stemmer.stem(word).toString());
+		}
+	}
+	*/
 
 	/**
 	 * Returns a list of cleaned and stemmed words parsed from the provided line.
@@ -75,14 +84,17 @@ public class TextFileStemmer {
 		try (BufferedReader read = Files.newBufferedReader(inputFile, StandardCharsets.UTF_8);) {
 			//create arrayList
 			ArrayList<String> list = new ArrayList<>();
+			// TODO Stemmer stemmer = ...
 			String line = null;
 			// only 1 line needs to be "in memory" at a time
 			while ((line = read.readLine()) != null) {
+				// TODO stemLine(line, stemmer, list)
+				// TODO Duplicate code and efficiency issue
 				//parses line into a string array
 				String[] parsed = TextParser.parse(line);
 				//adds cleaned and stemmed parsed words into arrayList
 				for (String word : parsed) {
-					list.addAll(uniqueStems(word));
+					list.addAll(uniqueStems(word)); // TODO Does this work?
 				}
 			}
 			return list;
@@ -116,6 +128,7 @@ public class TextFileStemmer {
 	 * @see TextParser#parse(String)
 	 */
 	public static TreeSet<String> uniqueStems(String line, Stemmer stemmer) {
+		// TODO Duplicate code, same downcast issue
 		//create treeSet
 		TreeSet<String> set = new TreeSet<>();
 		//parse line into string array
@@ -139,6 +152,7 @@ public class TextFileStemmer {
 	 * @see TextParser#parse(String)
 	 */
 	public static TreeSet<String> uniqueStems(Path inputFile) throws IOException {
+		// TODO Same issues
 		//open file for reading
 		try (BufferedReader read = Files.newBufferedReader(inputFile, StandardCharsets.UTF_8);) {
 			//create treeSet

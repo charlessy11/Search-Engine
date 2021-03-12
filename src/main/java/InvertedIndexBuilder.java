@@ -10,6 +10,9 @@ import java.nio.file.Path;
  */
 public class InvertedIndexBuilder {
 	
+	// TODO Throw the exceptions
+	// TODO Only the code interacting with the user should output to the console
+	
 	/**
 	 * Parses stemmed and cleaned words from file then 
 	 * adds word, location, and position to inverted index.

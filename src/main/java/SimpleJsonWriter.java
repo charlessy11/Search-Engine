@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set; // TODO Configure Eclipse to remove unused imports for you
 import java.util.Map.Entry;
 
 /**
@@ -43,10 +44,10 @@ public class SimpleJsonWriter {
 				indent(iterator.next().toString(), writer, level + 1);
 			}
 			writer.write('\n');
-			indent("]", writer, level);
+			indent("]", writer, level); // TODO Remove
 		}
-		else {
-			indent("]", writer, level);
+		else { // TODO Remove
+			indent("]", writer, level); // TODO Always happens
 		}
 	}
 
@@ -64,12 +65,14 @@ public class SimpleJsonWriter {
 		writer.write('\n');
 		if (!elements.isEmpty()) {
 			Iterator<Entry<String, Integer>> iterator = elements.entrySet().iterator();
-			var entry1 = iterator.next();
+			var entry1 = iterator.next(); // TODO first
+			
+			// TODO Moving the duplicate code into a "writePair" "writeEntry" method
 			quote(entry1.getKey(), writer, 1);
 			writer.write(": ");
 			writer.write(entry1.getValue().toString());
 			while (iterator.hasNext()) {
-				var entry2 = iterator.next();
+				var entry2 = iterator.next(); // TODO nexy
 				writer.write(',');
 				writer.write('\n');
 				quote(entry2.getKey(), writer, 1);
@@ -129,15 +132,16 @@ public class SimpleJsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
+	// TODO InvertedIndex elements --> Map <String, Map<String, Set<Integer>>> map
 	public static void asInvertedIndex(InvertedIndex elements, Writer writer,
 			int level) throws IOException {
 		writer.write('{');
 		writer.write('\n');
 		int curr_size = 0;
 		if (curr_size != elements.size()) {
-			var iterator = elements.get().iterator();		
+			var iterator = elements.get().iterator();
 			var entry1 = iterator.next();
-			quote(entry1, writer, 1);
+			quote(entry1, writer, 1); // TODO Avoid the hard-coded levels 
 			writer.write(": ");
 			SimpleJsonWriter.asNestedArray(elements.map.get(entry1), writer, 2);
 			while (iterator.hasNext()) {
