@@ -157,7 +157,7 @@ public class InvertedIndex {
 	 * @see Collections#unmodifiableCollection(Collection)
 	 */
 	public Collection<Integer> get(String word, String location) {
-		if (map.get(word).containsKey(location)) { // TODO Use your own contains method
+		if (map.containsKey(word) && map.get(word).containsKey(location)) {
 			return Collections.unmodifiableCollection(map.get(word).get(location));
 		}
 		return Collections.emptySet();
