@@ -8,7 +8,6 @@ import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set; // TODO Configure Eclipse to remove unused imports for you
 import java.util.Map.Entry;
 
 /**
@@ -44,10 +43,7 @@ public class SimpleJsonWriter {
 				indent(iterator.next().toString(), writer, level + 1);
 			}
 			writer.write('\n');
-			indent("]", writer, level); // TODO Remove
-		}
-		else { // TODO Remove
-			indent("]", writer, level); // TODO Always happens
+			indent("]", writer, level);
 		}
 	}
 
@@ -65,25 +61,35 @@ public class SimpleJsonWriter {
 		writer.write('\n');
 		if (!elements.isEmpty()) {
 			Iterator<Entry<String, Integer>> iterator = elements.entrySet().iterator();
-			var entry1 = iterator.next(); // TODO first
-			
-			// TODO Moving the duplicate code into a "writePair" "writeEntry" method
-			quote(entry1.getKey(), writer, 1);
-			writer.write(": ");
-			writer.write(entry1.getValue().toString());
+			var first = iterator.next();
+			SimpleJsonWriter.writeEntry(first, writer);
 			while (iterator.hasNext()) {
-				var entry2 = iterator.next(); // TODO nexy
+				var next = iterator.next();
 				writer.write(',');
 				writer.write('\n');
-				quote(entry2.getKey(), writer, 1);
-				writer.write(": ");
-				writer.write(entry2.getValue().toString());
+				SimpleJsonWriter.writeEntry(next, writer);
 			}
 			writer.write('\n');
 			writer.write('}');
 		}
 		else {
 			writer.write('}');
+		}
+	}
+	
+	/**
+	 * Writes the entry for asObject function
+	 * 
+	 * @param entry the entry to write
+	 * @param writer the writer to use
+	 */
+	public static void writeEntry(Entry<String, Integer> entry, Writer writer) {
+		try {
+			quote(entry.getKey(), writer, 1);
+			writer.write(": ");
+			writer.write(entry.getValue().toString());
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -104,23 +110,36 @@ public class SimpleJsonWriter {
 		writer.write('\n');
 		if (!elements.isEmpty()) {
 			var iterator = elements.entrySet().iterator();		
-			var entry1 = iterator.next();
-			quote(entry1.getKey(), writer, level);
-			writer.write(": ");
-			SimpleJsonWriter.asArray(entry1.getValue(), writer, level);
+			var first = iterator.next();
+			SimpleJsonWriter.writeEntry(first, writer, level);
 			while (iterator.hasNext()) {
-				var entry2 = iterator.next();
+				var next = iterator.next();
 				writer.write(',');
 				writer.write('\n');
-				quote(entry2.getKey(), writer, level);
-				writer.write(": ");
-				SimpleJsonWriter.asArray(entry2.getValue(), writer, level);
+				SimpleJsonWriter.writeEntry(next, writer, level);
 			}
 			writer.write('\n');
 			indent("}", writer, 1);
 		}
 		else {
 			writer.write('}');
+		}
+	}
+	
+	/**
+	 * Writes the entry for asNestedArray function
+	 * 
+	 * @param entry the entry to write
+	 * @param writer the writer to use
+	 * @param level the level to use
+	 */
+	public static void writeEntry(Entry<String, ? extends Collection<Integer>> entry, Writer writer, int level) {
+		try {
+			quote(entry.getKey(), writer, level);
+			writer.write(": ");
+			SimpleJsonWriter.asArray(entry.getValue(), writer, level);
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -140,17 +159,17 @@ public class SimpleJsonWriter {
 		int curr_size = 0;
 		if (curr_size != elements.size()) {
 			var iterator = elements.get().iterator();
-			var entry1 = iterator.next();
-			quote(entry1, writer, 1); // TODO Avoid the hard-coded levels 
+			var first = iterator.next();
+			quote(first, writer, level+1);
 			writer.write(": ");
-			SimpleJsonWriter.asNestedArray(elements.map.get(entry1), writer, 2);
+			SimpleJsonWriter.asNestedArray(elements.map.get(first), writer, level+2);
 			while (iterator.hasNext()) {
-				var entry2 = iterator.next();
+				var next = iterator.next();
 				writer.write(',');
 				writer.write('\n');
-				quote(entry2, writer, 1);
+				quote(next, writer, 1);
 				writer.write(": ");
-				SimpleJsonWriter.asNestedArray(elements.map.get(entry2), writer, 2);
+				SimpleJsonWriter.asNestedArray(elements.map.get(next), writer, level+2);
 			}
 			writer.write('\n');
 			writer.write('}');
