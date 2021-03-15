@@ -152,7 +152,7 @@ public class SimpleJsonWriter {
 	 * @throws IOException if an IO error occurs
 	 */
 	// TODO InvertedIndex elements --> Map <String, Map<String, Set<Integer>>> map
-	public static void asInvertedIndex(InvertedIndex elements, Writer writer,
+	public static void asInvertedIndex(Map <String, Map<String, Set<Integer>>> map, Writer writer,
 			int level) throws IOException {
 		writer.write('{');
 		writer.write('\n');
