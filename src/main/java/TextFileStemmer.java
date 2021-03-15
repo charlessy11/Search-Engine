@@ -4,10 +4,12 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.TreeSet;
 
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
+import opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM;
 
 /**
  * Utility class for parsing and stemming text and text files into collections
@@ -36,23 +38,23 @@ public class TextFileStemmer {
 	public static ArrayList<String> listStems(String line, Stemmer stemmer) {
 		//create arrayList
 		ArrayList<String> list = new ArrayList<>();
-		//parses line into string array
-		String[] parsed = TextParser.parse(line);
-		//adds cleaned and stemmed parsed words into arrayList
-		for (String word : parsed) {
-			list.add((String) stemmer.stem(word)); // TODO Don't downcast... use toString
-		}
+		TextFileStemmer.stemLine(line, stemmer, list);
 		return list;
 	}
-	
-	/* TODO 
+
+	/**
+	 * Parses line into string array adds cleaned and stemmed parsed words into collection
+	 * 
+	 * @param line the line of words to clean, split, and stem
+	 * @param stemmer the stemmer to use
+	 * @param stems the collection to add the stemmed words
+	 */
 	public static void stemLine(String line, Stemmer stemmer, Collection<String> stems) {
 		String[] parsed = TextParser.parse(line);
 		for (String word : parsed) {
 			stems.add(stemmer.stem(word).toString());
 		}
 	}
-	*/
 
 	/**
 	 * Returns a list of cleaned and stemmed words parsed from the provided line.
@@ -84,18 +86,11 @@ public class TextFileStemmer {
 		try (BufferedReader read = Files.newBufferedReader(inputFile, StandardCharsets.UTF_8);) {
 			//create arrayList
 			ArrayList<String> list = new ArrayList<>();
-			// TODO Stemmer stemmer = ...
+			Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
 			String line = null;
 			// only 1 line needs to be "in memory" at a time
 			while ((line = read.readLine()) != null) {
-				// TODO stemLine(line, stemmer, list)
-				// TODO Duplicate code and efficiency issue
-				//parses line into a string array
-				String[] parsed = TextParser.parse(line);
-				//adds cleaned and stemmed parsed words into arrayList
-				for (String word : parsed) {
-					list.addAll(uniqueStems(word)); // TODO Does this work?
-				}
+				stemLine(line, stemmer, list);
 			}
 			return list;
 		}
@@ -128,15 +123,9 @@ public class TextFileStemmer {
 	 * @see TextParser#parse(String)
 	 */
 	public static TreeSet<String> uniqueStems(String line, Stemmer stemmer) {
-		// TODO Duplicate code, same downcast issue
 		//create treeSet
 		TreeSet<String> set = new TreeSet<>();
-		//parse line into string array
-		String[] parsed = TextParser.parse(line);
-		//adds unique, cleaned and stemmed parsed words into treeSet
-		for (String word : parsed) {
-			set.add((String) stemmer.stem(word));
-		}
+		TextFileStemmer.stemLine(line, stemmer, set);
 		return set;
 	}
 
@@ -152,19 +141,14 @@ public class TextFileStemmer {
 	 * @see TextParser#parse(String)
 	 */
 	public static TreeSet<String> uniqueStems(Path inputFile) throws IOException {
-		// TODO Same issues
 		//open file for reading
 		try (BufferedReader read = Files.newBufferedReader(inputFile, StandardCharsets.UTF_8);) {
 			//create treeSet
 			TreeSet<String> set = new TreeSet<>();
 			String line = null;
+			Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
 			while ((line = read.readLine()) != null) {
-				//parses line into a string array
-				String[] parsed = TextParser.parse(line);
-				//adds unique, cleaned and stemmed parsed words into treeSet
-				for (String word : parsed) {
-					set.addAll(uniqueStems(word)); 
-				}
+				TextFileStemmer.stemLine(line, stemmer, set);
 			}
 			return set;
 		}

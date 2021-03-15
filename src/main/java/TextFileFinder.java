@@ -45,11 +45,7 @@ public class TextFileFinder {
 	 * @see Files#walk(Path, FileVisitOption...)
 	 */
 	public static Stream<Path> find(Path start, Predicate<Path> keep) throws IOException {	
-		Stream<Path> textFiles = Files.walk(start, FileVisitOption.FOLLOW_LINKS)
-			.filter(keep);
-		return textFiles;
-		
-		// TODO return Files.walk(start, FileVisitOption.FOLLOW_LINKS).filter(keep);
+		return Files.walk(start, FileVisitOption.FOLLOW_LINKS).filter(keep);
 	}	
 
 	/**
@@ -77,8 +73,6 @@ public class TextFileFinder {
 	 * @see Collectors#toList()
 	 */
 	public static List<Path> list(Path start) throws IOException {
-		List<Path> textFiles = TextFileFinder.find(start)
-				.collect(Collectors.toList());
-		return textFiles; // TODO Single return?
+		return TextFileFinder.find(start).collect(Collectors.toList());
 	}
 }

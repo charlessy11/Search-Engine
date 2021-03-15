@@ -31,7 +31,11 @@ public class Driver {
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
-			InvertedIndexBuilder.add(invertedIndex, map.getPath("-text"));
+			try {
+				InvertedIndexBuilder.add(invertedIndex, map.getPath("-text"));
+			} catch (IOException e) {
+				System.out.println("Error: Unable to open file.");
+			}
 		}
 		else if (map.hasFlag("-text") && !map.hasValue("-text")) {
 			System.out.println("Warning: No value given to -text flag");
@@ -41,7 +45,7 @@ public class Driver {
 		if (map.hasFlag("-index")) {
 			try {
 				//use given path (or index.json as the default output path) to print inverted index as JSON
-				SimpleJsonWriter.asInvertedIndex(invertedIndex, map.getPath("-index", Path.of("index.json")));
+				InvertedIndex.toJson(invertedIndex, map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
 			}
