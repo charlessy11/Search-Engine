@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeMap;
@@ -56,7 +58,10 @@ public class InvertedIndex {
 	 *         the number of words stored for that element
 	 */
 	public int size(String word) {
-		return map.get(word).size(); // TODO null pointer issues!
+		if (map.get(word) != null) {
+			return map.get(word).size();
+		}
+		return -1;
 	}
 	
 	/**
@@ -68,7 +73,10 @@ public class InvertedIndex {
 	 *         the number of words stored for that element
 	 */
 	public int size(String word, String location) {
-		return map.get(word).get(location).size(); // TODO Avoid the null pointer exception
+		if (map.get(word).get(location) != null) {
+			return map.get(word).get(location).size();
+		}
+		return -1;
 	}
 	
 	/**
@@ -78,10 +86,7 @@ public class InvertedIndex {
 	 * @return {@true} if the location is stored in the index
 	 */
 	public boolean contains(String word) {
-		if (map.containsKey(word)) { // TODO single return
-			return true;
-		}
-		return false;
+		return map.containsKey(word);
 	}
 	
 	/**
@@ -163,6 +168,14 @@ public class InvertedIndex {
 		return this.map.toString();
 	}
 	
-	// TODO Add a toJson(Path path) methods here that calls SimpleJsonWriter
-	// TODO Driver calls InvertedIndex.toJson which calls SimpleJsonWriter.asInvertedIndex
+	/**
+	 * Calls SimpleJsonWriter's asInvertedIndex method
+	 * 
+	 * @param invertedIndex the inverted index
+	 * @param path the path given by user or default path if otherwise
+	 * @throws IOException
+	 */
+	public static void toJson(InvertedIndex invertedIndex, Path path) throws IOException {
+		SimpleJsonWriter.asInvertedIndex(invertedIndex, path);
+	}
 }
