@@ -16,6 +16,7 @@ import java.util.stream.Stream;
  * @version Spring 2021
  */
 public class TextFileFinder {
+	static Path p;
 	static String lower = p.toString().toLowerCase();
 	/**
 	 * A lambda function that returns true if the path is a file that ends in a
