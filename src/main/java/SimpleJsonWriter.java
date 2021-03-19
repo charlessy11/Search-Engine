@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
@@ -153,24 +152,24 @@ public class SimpleJsonWriter {
 	 * @throws IOException if an IO error occurs
 	 */
 	// TODO InvertedIndex elements --> Map <String, Map<String, Set<Integer>>> map
-	public static void asInvertedIndex(Map <String, Map<String, Set<Integer>>> map, Writer writer,
+	public static void asInvertedIndex(InvertedIndex elements, Writer writer,
 			int level) throws IOException {
 		writer.write('{');
 		writer.write('\n');
 		int curr_size = 0;
-		if (curr_size != map.size()) {
+		if (curr_size != elements.size()) {
 			var iterator = elements.get().iterator();
 			var first = iterator.next();
 			quote(first, writer, level+1);
 			writer.write(": ");
-			SimpleJsonWriter.asNestedArray(map.get(first), writer, level+2);
+			SimpleJsonWriter.asNestedArray(elements.map.get(first), writer, level+2);
 			while (iterator.hasNext()) {
 				var next = iterator.next();
 				writer.write(',');
 				writer.write('\n');
 				quote(next, writer, 1);
 				writer.write(": ");
-				SimpleJsonWriter.asNestedArray(map.get(next), writer, level+2);
+				SimpleJsonWriter.asNestedArray(elements.map.get(next), writer, level+2);
 			}
 			writer.write('\n');
 			writer.write('}');
@@ -245,12 +244,12 @@ public class SimpleJsonWriter {
 	 * @param path the file path to use
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void asInvertedIndex(Map <String, Map<String, Set<Integer>>> map, Path path) throws IOException {
+	public static void asInvertedIndex(InvertedIndex elements, Path path) throws IOException {
 		try (
 				BufferedWriter writer = Files.newBufferedWriter(path,
 						StandardCharsets.UTF_8)
 		) {
-			asInvertedIndex(map, writer, 0);
+			asInvertedIndex(elements, writer, 0);
 		}	
 	}
 
@@ -319,10 +318,10 @@ public class SimpleJsonWriter {
 	 * @return a {@link String} containing the elements in pretty JSON format
 	 *
 	 */
-	public static String asInvertedIndex(Map <String, Map<String, Set<Integer>>> map) {
+	public static String asInvertedIndex(InvertedIndex elements) {
 		try {
 			StringWriter writer = new StringWriter();
-			asInvertedIndex(map, writer, 0);
+			asInvertedIndex(elements, writer, 0);
 			return writer.toString();
 		}
 		catch (IOException e) {

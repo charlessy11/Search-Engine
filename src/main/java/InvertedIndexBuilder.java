@@ -26,6 +26,7 @@ public class InvertedIndexBuilder {
 				//add word, location, and position to inverted index
 				invertedIndex.add(word, path.toString(), position);
 				position++; //increment position
+				
 			}
 		}
 		else if(Files.isDirectory(path)) {

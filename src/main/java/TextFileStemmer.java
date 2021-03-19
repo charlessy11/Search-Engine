@@ -72,7 +72,7 @@ public class TextFileStemmer {
 
 	/**
 	 * Reads a file line by line, parses each line into cleaned and stemmed words,
-	 * and then adds those words to a set.
+	 * and then adds those words to a list.
 	 *
 	 * @param inputFile the input file to parse
 	 * @return a sorted set of stems from file

@@ -40,6 +40,12 @@ public class InvertedIndex {
 		map.get(word).putIfAbsent(location, new TreeSet<>());
 		map.get(word).get(location).add(position);
 	}
+	
+//	public Map<String, Integer> count(String location) {
+//		TreeMap<String, Integer> wordCount = new TreeMap<>();
+//		wordCount.put(location, map.size());
+//		return wordCount;
+//	}
 	/**
 	 * Returns the number of words stored in the index.
 	 *
@@ -175,7 +181,7 @@ public class InvertedIndex {
 	 * @param path the path given by user or default path if otherwise
 	 * @throws IOException
 	 */
-	public static void toJson(InvertedIndex invertedIndex, Path path) throws IOException {
-		SimpleJsonWriter.asInvertedIndex(invertedIndex, path);
+	public static void toJson(InvertedIndex elements, Path path) throws IOException {
+		SimpleJsonWriter.asInvertedIndex(elements, path);
 	}
 }
