@@ -41,10 +41,10 @@ public class InvertedIndex {
 		map.get(word).get(location).add(position);
 	}
 	
-//	public Map<String, Integer> count(String location) {
+//	public static void count(String location, Integer counter) {
 //		TreeMap<String, Integer> wordCount = new TreeMap<>();
-//		wordCount.put(location, map.size());
-//		return wordCount;
+//		wordCount.put(location, counter);
+//		SimpleJsonWriter.asObject(wordCount, map.getPath("-counts", Path.of("counts.json")));
 //	}
 	/**
 	 * Returns the number of words stored in the index.

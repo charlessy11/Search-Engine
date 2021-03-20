@@ -26,9 +26,9 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM;
  */
 public class Driver {
 	
-	private static final Charset UTF8 = null;
-	/** The stemmer to use for the cleaning methods. */
-	public static final Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
+//	private static final Charset UTF8 = null;
+//	/** The stemmer to use for the cleaning methods. */
+//	public static final Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
 
 	/**
 	 * Initializes the classes necessary based on the provided command-line
@@ -64,43 +64,60 @@ public class Driver {
 				//use given path (or index.json as the default output path) to print inverted index as JSON
 				InvertedIndex.toJson(invertedIndex, map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
-				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
+				System.out.println("Error: Unable to calculate total amount of stemmed words.");
 			}
 		}
 		
+		//optional flag to output all of the locations and their word count
 		if (map.hasFlag("-counts")) {
 			try {
-//				SimpleJsonWriter.asObject(invertedIndex.count(map.getPath("-counts").toString()), map.getPath("-counts", Path.of("counts.json")));
-				TreeMap<String, Integer> wordCount = new TreeMap<>();
-				wordCount.put(map.getPath("-counts").toString(), invertedIndex.size());
-				SimpleJsonWriter.asObject(wordCount, map.getPath("-counts", Path.of("counts.json")));
+//				TreeMap<String, Integer> wordCount = new TreeMap<>();
+//				wordCount.put(map.getPath("-counts").toString(), invertedIndex.size());
+				//use given path (or counts.json as the default output path) to print pretty JSON
+				SimpleJsonWriter.asObject(InvertedIndexBuilder.wordCount, map.getPath("-counts", Path.of("counts.json")));
 			} catch (IOException e) {
 				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
 			}
 		}
 		
-		if (map.hasFlag("-query") && map.hasValue("-query")) {
+		//indicates the next argument is a path to a text file of queries to be used for search
+		if (map.hasFlag("-query")) {
 			Path path = map.getPath("-query");
-			//splitting the cleaned line into words by whitespace
-			Function<String, String[]> tokenize = s -> s.split("\\s+");
 			//cleaning the line of any non-alphabetic chars and converting the remaining chars to lowercase
-			Function<String, String> clean = s -> s.replaceAll("[^A-z\\s]+", " ").toLowerCase(); 
+			Function<String, String> clean = s -> s.replaceAll("[^A-z\\s]+", " ").toLowerCase();
+			//splitting the cleaned line into words by whitespace
+			Function<String, String[]> tokenize = s -> s.split("\\s+"); 
 			Supplier<TreeSet<String>> collector = TreeSet::new; //removes duplicates and sorts alphabetically
-			try (
-				BufferedReader reader = Files.newBufferedReader(path, UTF8);
-				Stream<String> lines = reader.lines();
-			) {
-				lines
-					.flatMap(line -> Stream.of(tokenize.apply(line)))
-					.map(clean)
-					.map(word -> (String)stemmer.stem(word)) //stemming each word
-					.collect(Collectors.toCollection(collector));
+			try {
+				InvertedIndexBuilder.parseQuery(path, clean, tokenize, collector);
+				//optional flag that indicates all search operations performed should be exact search
+				if (map.hasFlag("-exact")) {
+					
+				}
+				
+				//partial search
+				else if (!map.hasFlag("-exact")) {
+					
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+//			try (
+//				BufferedReader reader = Files.newBufferedReader(path, UTF8);
+//				Stream<String> lines = reader.lines();
+//			) {
+//				lines.parallel()
+//					.flatMap(line -> Stream.of(tokenize.apply(line)))
+//					.map(clean)
+//					.map(word -> (String)stemmer.stem(word)) //stemming each word
+//					.collect(Collectors.toCollection(collector));
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
 		}
-		else if (map.hasFlag("-query") && !map.hasValue("-query")) {
-			System.out.println("Warning: No value given to -query flag");
+		//no search should be performed
+		else if (!map.hasFlag("-query")) {
+			System.out.println("Warning: No value given to -query flag, therfore no search to be performed.");
 		}
 		
 		// calculate time elapsed and output
