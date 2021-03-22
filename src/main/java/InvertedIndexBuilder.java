@@ -36,32 +36,34 @@ public class InvertedIndexBuilder {
 	 * @throws IOException 
 	 */
 	public static void add(InvertedIndex invertedIndex, Path path) throws IOException {
-		Integer counter = 1;
+//		int counter = 1;
 		//check if path is a regular file
 		if (Files.isRegularFile(path)) {
-			int position = 1; //position start at index 1
+			int counter = 1; //position start at index 1
 			//get each stemmed and cleaned word from list
 			for (String word : TextFileStemmer.listStems(path)) {
 				//add word, location, and position to inverted index
-				invertedIndex.add(word, path.toString(), position);
-				position++; //increment position
+				invertedIndex.add(word, path.toString(), counter);
 //				InvertedIndex.count(path.toString(), counter++);
-				wordCount.put(path.toString(), counter);
-				counter++;
+				if (path.toString().toLowerCase().endsWith(".text") || path.toString().toLowerCase().endsWith(".txt")) {
+					wordCount.put(path.toString(), counter);
+				}
+//				counter++;
 			}
+			counter++; //increment counter
 		}
 		else if(Files.isDirectory(path)) {
 			//get each file from list of text files
 			for (Path file : TextFileFinder.list(path)) {
-				int position = 1; //position start at index 1
+				int counter = 1; //position start at index 1
 				//get each stemmed and cleaned word from list
 				for (String word : TextFileStemmer.listStems(file)) {
 					//add word, location, and position to inverted index
-					invertedIndex.add(word, file.toString(), position);
-					position++; //increment position
+					invertedIndex.add(word, file.toString(), counter);
 //					InvertedIndex.count(file.toString(), counter++);
 					wordCount.put(file.toString(), counter);
-					counter++;
+//					counter++;
+					counter++; //increment counter
 				}
 			}
 		}

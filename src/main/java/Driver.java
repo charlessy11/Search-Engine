@@ -72,9 +72,10 @@ public class Driver {
 		if (map.hasFlag("-counts")) {
 			try {
 //				TreeMap<String, Integer> wordCount = new TreeMap<>();
-//				wordCount.put(map.getPath("-counts").toString(), invertedIndex.size());
+//				wordCount.put(map.getPath("-text").toString(), invertedIndex.size());
 				//use given path (or counts.json as the default output path) to print pretty JSON
 				SimpleJsonWriter.asObject(InvertedIndexBuilder.wordCount, map.getPath("-counts", Path.of("counts.json")));
+//				SimpleJsonWriter.asObject(wordCount, map.getPath("-counts", Path.of("counts.json")));
 			} catch (IOException e) {
 				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
 			}
