@@ -5,6 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
@@ -46,6 +48,8 @@ public class Driver {
 		//build inverted index
 		InvertedIndex invertedIndex = new InvertedIndex();
 		
+		InvertedIndexBuilder.wordCount.clear();
+		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
 			try {
@@ -58,13 +62,14 @@ public class Driver {
 			System.out.println("Warning: No value given to -text flag");
 		}
 		
+		
 		//check for optional flag
 		if (map.hasFlag("-index")) {
 			try {
 				//use given path (or index.json as the default output path) to print inverted index as JSON
 				InvertedIndex.toJson(invertedIndex, map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
-				System.out.println("Error: Unable to calculate total amount of stemmed words.");
+				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
 			}
 		}
 		
@@ -77,7 +82,7 @@ public class Driver {
 				SimpleJsonWriter.asObject(InvertedIndexBuilder.wordCount, map.getPath("-counts", Path.of("counts.json")));
 //				SimpleJsonWriter.asObject(wordCount, map.getPath("-counts", Path.of("counts.json")));
 			} catch (IOException e) {
-				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
+				System.out.println("Error: Unable to calculate total amount of stemmed words.");
 			}
 		}
 		
@@ -90,7 +95,7 @@ public class Driver {
 			Function<String, String[]> tokenize = s -> s.split("\\s+"); 
 			Supplier<TreeSet<String>> collector = TreeSet::new; //removes duplicates and sorts alphabetically
 			try {
-				InvertedIndexBuilder.parseQuery(path, clean, tokenize, collector);
+				System.out.println(InvertedIndexBuilder.parseQuery(path, clean, tokenize, collector));
 				//optional flag that indicates all search operations performed should be exact search
 				if (map.hasFlag("-exact")) {
 					
@@ -103,18 +108,6 @@ public class Driver {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-//			try (
-//				BufferedReader reader = Files.newBufferedReader(path, UTF8);
-//				Stream<String> lines = reader.lines();
-//			) {
-//				lines.parallel()
-//					.flatMap(line -> Stream.of(tokenize.apply(line)))
-//					.map(clean)
-//					.map(word -> (String)stemmer.stem(word)) //stemming each word
-//					.collect(Collectors.toCollection(collector));
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
 		}
 		//no search should be performed
 		else if (!map.hasFlag("-query")) {
