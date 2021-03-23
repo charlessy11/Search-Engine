@@ -4,7 +4,7 @@
  * @author jett
  *
  */
-public class singleSearchResult implements Comparable<Object> {
+public class SingleSearchResult implements Comparable<SingleSearchResult> {
 
 	String location;
 	int count;
@@ -22,15 +22,22 @@ public class singleSearchResult implements Comparable<Object> {
 		return matches;
 	}
 	
-	public int setScore() {
-		int score = getMatches() / getCount();
+	public double setScore() {
+		double score = (double)getMatches() / getCount();
 		return score;
 	}
 	
+
 	@Override
-	public int compareTo(Object o) {
+	public int compareTo(SingleSearchResult o) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
+	
+//	@Override
+//	public String toString() {
+//		return;
+//		
+//	}
 	
 }
