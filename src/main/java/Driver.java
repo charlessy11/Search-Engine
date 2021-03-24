@@ -33,12 +33,14 @@ public class Driver {
 		//build inverted index
 		InvertedIndex invertedIndex = new InvertedIndex();
 		
+		InvertedIndexBuilder builder = new InvertedIndexBuilder(invertedIndex);
+		
 		InvertedIndexBuilder.wordCount.clear();
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
 			try {
-				InvertedIndexBuilder.add(invertedIndex, map.getPath("-text"));
+				builder.add(invertedIndex, map.getPath("-text"));
 			} catch (IOException e) {
 				System.out.println("Error: Unable to open file.");
 			}
@@ -72,7 +74,7 @@ public class Driver {
 		if (map.hasFlag("-query")) {
 //			Path path = map.getPath("-query");
 			try {
-				InvertedIndexBuilder.parseQuery(map.getPath("-query"));
+				builder.parseQuery(map.getPath("-query"));
 				//optional flag that indicates all search operations performed should be exact search
 				if (map.hasFlag("-exact")) {
 					

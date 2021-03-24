@@ -2,14 +2,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.function.Function;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -21,6 +17,11 @@ import java.nio.charset.StandardCharsets;
 public class InvertedIndexBuilder {
 	
 	public static TreeMap<String, Integer> wordCount = new TreeMap<>();
+	
+	InvertedIndex invertedIndex;
+	public InvertedIndexBuilder(InvertedIndex invertedIndex) {
+		this.invertedIndex = invertedIndex;
+	}
 	/**
 	 * Parses stemmed and cleaned words from file then 
 	 * adds word, location, and position to inverted index.
@@ -29,7 +30,7 @@ public class InvertedIndexBuilder {
 	 * @param path the path of the file
 	 * @throws IOException 
 	 */
-	public static void add(InvertedIndex invertedIndex, Path path) throws IOException {
+	public void add(InvertedIndex invertedIndex, Path path) throws IOException {
 		//check if path is a regular file
 		if (Files.isRegularFile(path)) {
 			int position = 1; //position start at index 1
@@ -58,17 +59,20 @@ public class InvertedIndexBuilder {
 		}
 	}
 	
-	public static List<Set<String>> parseQuery(Path path) throws IOException {
-		List<Set<String>> list = new ArrayList<>();
-//		TreeSet<String> set = new TreeSet<>();
+	Map<String, List<SingleSearchResult>> results = new TreeMap<>();
+	
+	public void parseQuery(Path path) throws IOException {
 		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
 			String line;
 			while ((line = read.readLine()) != null) {
+				//assigns set a set of unique, cleaned and stemmed words parsed from line
 				TreeSet<String> set = TextFileStemmer.uniqueStems(line);
-				list.add(set);
-//				InvertedIndex.exactSearch(set);
+				if (!set.isEmpty()) {
+					//puts a new string from set separated by spaces as key and list of search results as value
+					results.put(String.join(" ", set), invertedIndex.exactSearch(set));
+				}
 			}
 		}
-		return list;
+		System.out.println(results);
 	}	
 }

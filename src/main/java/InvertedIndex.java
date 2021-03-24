@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.Set;
 
@@ -190,23 +191,27 @@ public class InvertedIndex {
 	public List<SingleSearchResult> exactSearch(TreeSet<String> line) {
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> list = new ArrayList<>();
-		//check if word is in map
 		for (String word : line) {
-			if (map.containsKey(word)) {
+			//check if word is stored in inverted index
+			if (contains(word)) {
+//				System.out.println("test");
 				for (String path : get(word)) {
+//				//create search result object
+//				temp.putIfAbsent(path, new SingleSearchResult(path, InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
+//				temp.get(path).setMatches(get(word, path).size());
 					if (!temp.containsKey(path)) {
-						//create search result object
-						SingleSearchResult result = new SingleSearchResult(word, InvertedIndexBuilder.wordCount.get(path), get(word, path).size());
-						list.add(result);
-						temp.put(word, result);
+						temp.put(path, new SingleSearchResult(path, InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
 					}
 					else {
-						//set total matches and score
+						temp.get(path).setMatches(get(word, path).size());
 					}
 				}
 			}
 		}
+		list = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
 		Collections.sort(list);
+//		System.out.println("test");
+//		System.out.println(list);
 		return list;
 	}
 }

@@ -158,6 +158,7 @@ public class SimpleJsonWriter {
 		writer.write('\n');
 		int curr_size = 0;
 		if (curr_size != elements.size()) {
+//			var iterator = map.keySet().iterator();
 			var iterator = elements.get().iterator();
 			var first = iterator.next();
 			quote(first, writer, level+1);
