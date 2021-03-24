@@ -1,7 +1,9 @@
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Map;
@@ -183,5 +185,28 @@ public class InvertedIndex {
 	 */
 	public static void toJson(InvertedIndex elements, Path path) throws IOException {
 		SimpleJsonWriter.asInvertedIndex(elements, path);
+	}
+	
+	public List<SingleSearchResult> exactSearch(TreeSet<String> line) {
+		Map<String, SingleSearchResult> temp = new TreeMap<>();
+		List<SingleSearchResult> list = new ArrayList<>();
+		//check if word is in map
+		for (String word : line) {
+			if (map.containsKey(word)) {
+				for (String path : get(word)) {
+					if (!temp.containsKey(path)) {
+						//create search result object
+						SingleSearchResult result = new SingleSearchResult(word, InvertedIndexBuilder.wordCount.get(path), get(word, path).size());
+						list.add(result);
+						temp.put(word, result);
+					}
+					else {
+						//set total matches and score
+					}
+				}
+			}
+		}
+		Collections.sort(list);
+		return list;
 	}
 }

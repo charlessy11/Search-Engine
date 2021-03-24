@@ -1,19 +1,16 @@
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import opennlp.tools.stemmer.Stemmer;
-import opennlp.tools.stemmer.snowball.SnowballStemmer;
-import opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Builds Inverted Index
@@ -23,8 +20,6 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM;
  */
 public class InvertedIndexBuilder {
 	
-	/** The stemmer to use for the cleaning methods. */
-	private static final Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
 	public static TreeMap<String, Integer> wordCount = new TreeMap<>();
 	/**
 	 * Parses stemmed and cleaned words from file then 
@@ -63,18 +58,17 @@ public class InvertedIndexBuilder {
 		}
 	}
 	
-	public static Collection<String> parseQuery(Path path, Function<String, String> clean, 
-			Function<String, String[]> tokenize, Supplier<TreeSet<String>> collector) throws IOException {
-		try (
-			BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
-			Stream<String> lines =	reader.lines();
-//			Stream<String> lines = Files.newBufferedReader(path).lines();
-		) {
-			return lines
-			.flatMap(line -> Stream.of(tokenize.apply(line)))
-			.map(clean)
-			.map(word -> (String)stemmer.stem(word)) //stemming each word
-			.collect(Collectors.toCollection(collector));
+	public static List<Set<String>> parseQuery(Path path) throws IOException {
+		List<Set<String>> list = new ArrayList<>();
+//		TreeSet<String> set = new TreeSet<>();
+		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+			String line;
+			while ((line = read.readLine()) != null) {
+				TreeSet<String> set = TextFileStemmer.uniqueStems(line);
+				list.add(set);
+//				InvertedIndex.exactSearch(set);
+			}
 		}
-	}
+		return list;
+	}	
 }
