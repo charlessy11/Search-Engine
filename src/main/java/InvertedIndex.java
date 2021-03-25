@@ -235,15 +235,31 @@ public class InvertedIndex {
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> listPartial = new ArrayList<>();
 		for (String word : line) {
-//			var iterator = map.entrySet().iterator();
-//			while (iterator.hasNext()) {
-//				var entry = iterator.next();
-//				if (entry.getKey().startsWith(word)) {
+			var iterator = map.entrySet().iterator();
+			while (iterator.hasNext()) {
+				var entry = iterator.next();
+				if (entry.getKey().startsWith(word)) {
+					for (String path : get(entry.getKey())) {
+//						System.out.println(word +" "+ entry.getKey()+" "+path);
+						if (!temp.containsKey(path)) {
+				
+							temp.put(path, new SingleSearchResult(path, 
+									InvertedIndexBuilder.wordCount.get(path), get(entry.getKey(), path).size()));
+						} 
+						else {
+							temp.get(path).setMatches(get(entry.getKey(), path).size());
+						}
+					}
+				}
+			}
+		}
+//			for (var key : map.entrySet()) {
+//				if (key.getKey().startsWith(word)) {
 //					for (String path : get(word)) {
 //						if (!temp.containsKey(path)) {
 //							temp.put(path, new SingleSearchResult(path, 
 //									InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
-//						} 
+//						}
 //						else {
 //							temp.get(path).setMatches(get(word, path).size());
 //						}
@@ -251,23 +267,9 @@ public class InvertedIndex {
 //				}
 //			}
 //		}
-			for (var key : map.entrySet()) {
-				if (key.getKey().startsWith(word)) {
-					for (String path : get(word)) {
-						if (!temp.containsKey(path)) {
-							temp.put(path, new SingleSearchResult(path, 
-									InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
-						}
-						else {
-							temp.get(path).setMatches(get(word, path).size());
-						}
-					}
-				}
-			}
-		}
 		listPartial = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
 		Collections.sort(listPartial);
-		System.out.println(listPartial);
+//		System.out.println(listPartial);
 		return listPartial;
 	}
 	

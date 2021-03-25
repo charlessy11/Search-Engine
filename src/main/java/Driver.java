@@ -71,7 +71,7 @@ public class Driver {
 		}
 		
 		//indicates the next argument is a path to a text file of queries to be used for search
-		if (map.hasFlag("-query")) {
+		if (map.hasFlag("-query") && map.hasValue("-query")) {
 			try {
 //				builder.parseQuery(map.getPath("-query"));
 				//optional flag that indicates all search operations performed should be exact search
