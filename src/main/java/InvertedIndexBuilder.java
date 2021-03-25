@@ -73,12 +73,12 @@ public class InvertedIndexBuilder {
 						results.put(String.join(" ", set), invertedIndex.exactSearch(set));
 					}
 				}
-//				else {
-//					if (!set.isEmpty()) {
-//						//puts a new string from set separated by spaces as key and list of search results as value
-//						results.put(String.join(" ", set), invertedIndex.partialSearch(set));
-//					}
-//				}
+				else {
+					if (!set.isEmpty()) {
+						//puts a new string from set separated by spaces as key and list of search results as value
+						results.put(String.join(" ", set), invertedIndex.partialSearch(set));
+					}
+				}
 			}
 		}
 //		System.out.println(results);
