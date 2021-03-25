@@ -30,6 +30,10 @@ public class SingleSearchResult implements Comparable<SingleSearchResult> {
 		return matches;
 	}
 	
+	public double getScore() {
+		return score;
+	}
+	
 	public void setMatches(int count) {
 		matches += count;
 		score = (double)matches / (double)count;

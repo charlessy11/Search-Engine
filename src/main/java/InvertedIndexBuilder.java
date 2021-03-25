@@ -59,7 +59,7 @@ public class InvertedIndexBuilder {
 		}
 	}
 	
-	Map<String, List<SingleSearchResult>> results = new TreeMap<>();
+	public static Map<String, List<SingleSearchResult>> results = new TreeMap<>();
 	
 	public void parseQuery(Path path) throws IOException {
 		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
@@ -73,6 +73,6 @@ public class InvertedIndexBuilder {
 				}
 			}
 		}
-		System.out.println(results);
+//		System.out.println(results);
 	}	
 }

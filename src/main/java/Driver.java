@@ -72,16 +72,15 @@ public class Driver {
 		
 		//indicates the next argument is a path to a text file of queries to be used for search
 		if (map.hasFlag("-query")) {
-//			Path path = map.getPath("-query");
 			try {
 				builder.parseQuery(map.getPath("-query"));
 				//optional flag that indicates all search operations performed should be exact search
 				if (map.hasFlag("-exact")) {
-					
+//					invertedIndex.exactSearch(null) 
 				}
 				
 				//partial search
-				else if (!map.hasFlag("-exact")) {
+				else {
 					
 				}
 			} catch (IOException e) {
@@ -91,6 +90,15 @@ public class Driver {
 		//no search should be performed
 		else if (!map.hasFlag("-query")) {
 			System.out.println("Warning: No value given to -query flag, therfore no search to be performed.");
+		}
+		
+		//optional flag that indicates the next argument is the path to use for the search results output file
+		if (map.hasFlag("-results")) {
+			try {
+				SimpleJsonWriter.asNestedResult(InvertedIndexBuilder.results, map.getPath("-results", Path.of("results.json")));
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		// calculate time elapsed and output
