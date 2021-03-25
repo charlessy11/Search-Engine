@@ -207,7 +207,7 @@ public class SimpleJsonWriter {
 			writer.write('\n');
 			quote("count", writer, level+2);
 			writer.write(": ");
-			writer.write(item.getMatches());
+			writer.write(Integer.toString(item.getMatches()));
 			writer.write(',');
 			writer.write('\n');
 			quote("score", writer, level+2);

@@ -192,6 +192,25 @@ public class InvertedIndex {
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> listExact = new ArrayList<>();
 		for (String word : line) {
+//			var iterator = map.entrySet().iterator();
+//			while (iterator.hasNext()) {
+//				var entry = iterator.next();
+//				if (contains(word)) {
+//					for (String path : get(word)) {
+//						if (!temp.containsKey(path)) {
+////							temp.put(path, new SingleSearchResult(path, InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
+//							SingleSearchResult results = new SingleSearchResult(path, InvertedIndexBuilder.wordCount.get(path), 
+//									get(word, path).size());
+//							listExact.add(results);
+//							temp.put(path, results);
+//						} 
+//						else {
+//							temp.get(path).setMatches(get(word, path).size());
+////							temp.get(path).setMatches(map.get(entry.getKey()).get(path).size());
+//						}
+//					}
+//				}
+//			}
 			//check if word is stored in inverted index
 			if (contains(word)) {
 				for (String path : get(word)) {
@@ -216,29 +235,15 @@ public class InvertedIndex {
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> listPartial = new ArrayList<>();
 		for (String word : line) {
-			var iterator = map.entrySet().iterator();
-			while (iterator.hasNext()) {
-				var entry = iterator.next();
-				if (entry.getKey().startsWith(word)) {
-					for (String path : get(word)) {
-						if (!temp.containsKey(path)) {
-							temp.put(path, new SingleSearchResult(path, 
-									InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
-						} 
-						else {
-							temp.get(path).setMatches(get(word, path).size());
-						}
-					}
-				}
-			}
-		}
-//			for (var key : map.entrySet()) {
-//				if (key.getKey().startsWith(word)) {
+//			var iterator = map.entrySet().iterator();
+//			while (iterator.hasNext()) {
+//				var entry = iterator.next();
+//				if (entry.getKey().startsWith(word)) {
 //					for (String path : get(word)) {
 //						if (!temp.containsKey(path)) {
 //							temp.put(path, new SingleSearchResult(path, 
 //									InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
-//						}
+//						} 
 //						else {
 //							temp.get(path).setMatches(get(word, path).size());
 //						}
@@ -246,6 +251,20 @@ public class InvertedIndex {
 //				}
 //			}
 //		}
+			for (var key : map.entrySet()) {
+				if (key.getKey().startsWith(word)) {
+					for (String path : get(word)) {
+						if (!temp.containsKey(path)) {
+							temp.put(path, new SingleSearchResult(path, 
+									InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
+						}
+						else {
+							temp.get(path).setMatches(get(word, path).size());
+						}
+					}
+				}
+			}
+		}
 		listPartial = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
 		Collections.sort(listPartial);
 		System.out.println(listPartial);

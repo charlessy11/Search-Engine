@@ -34,16 +34,16 @@ public class SingleSearchResult implements Comparable<SingleSearchResult> {
 		return score;
 	}
 	
-	public void setMatches(int count) {
-		matches += count;
+	public void setMatches(int size) {
+		matches += size;
 		score = (double)matches / (double)count;
 	}
 	
 	@Override
 	public int compareTo(SingleSearchResult other) {
-		int result = Double.compare(this.score, other.score);
+		int result = Double.compare(other.score, this.score);
 		if (result == 0) {
-			result = Integer.compare(this.matches, other.matches);
+			result = Integer.compare(other.matches, this.matches);
 		}
 		if (result == 0) {
 			result = this.location.compareToIgnoreCase(other.location);

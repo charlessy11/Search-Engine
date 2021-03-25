@@ -2,7 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.List;
+import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -59,9 +59,10 @@ public class InvertedIndexBuilder {
 		}
 	}
 	
-	public static Map<String, List<SingleSearchResult>> results = new TreeMap<>();
+	public static Map<String, Collection<SingleSearchResult>> results = new TreeMap<>();
 	
 	public void parseQuery(Path path, boolean exact) throws IOException {
+		results.clear();
 		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
 			String line;
 			while ((line = read.readLine()) != null) {
