@@ -35,7 +35,6 @@ public class Driver {
 		
 		InvertedIndexBuilder builder = new InvertedIndexBuilder(invertedIndex);
 		
-		InvertedIndexBuilder.wordCount.clear();
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
@@ -57,46 +56,6 @@ public class Driver {
 				InvertedIndex.toJson(invertedIndex, map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
-			}
-		}
-		
-		//optional flag to output all of the locations and their word count
-		if (map.hasFlag("-counts")) {
-			try {
-				//use given path (or counts.json as the default output path) to print pretty JSON
-				SimpleJsonWriter.asObject(InvertedIndexBuilder.wordCount, map.getPath("-counts", Path.of("counts.json")));
-			} catch (IOException e) {
-				System.out.println("Error: Unable to calculate total amount of stemmed words.");
-			}
-		}
-		
-		//indicates the next argument is a path to a text file of queries to be used for search
-		if (map.hasFlag("-query")) {
-			try {
-//				builder.parseQuery(map.getPath("-query"));
-				//optional flag that indicates all search operations performed should be exact search
-				if (map.hasFlag("-exact")) {
-					builder.parseQuery(map.getPath("-query"), true);
-				}
-				//partial search
-				else {
-					builder.parseQuery(map.getPath("-query"), false);
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		//no search should be performed
-		else if (!map.hasFlag("-query")) {
-			System.out.println("Warning: No value given to -query flag, therfore no search to be performed.");
-		}
-		
-		//optional flag that indicates the next argument is the path to use for the search results output file
-		if (map.hasFlag("-results")) {
-			try {
-				SimpleJsonWriter.asNestedResult(InvertedIndexBuilder.results, map.getPath("-results", Path.of("results.json")));
-			} catch (IOException e) {
-				e.printStackTrace();
 			}
 		}
 		

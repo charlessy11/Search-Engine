@@ -1,12 +1,9 @@
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.Set;
 
@@ -186,70 +183,5 @@ public class InvertedIndex {
 	 */
 	public static void toJson(InvertedIndex elements, Path path) throws IOException {
 		SimpleJsonWriter.asInvertedIndex(elements, path);
-	}
-	
-	public List<SingleSearchResult> exactSearch(TreeSet<String> line) {
-		Map<String, SingleSearchResult> temp = new TreeMap<>();
-		List<SingleSearchResult> listExact = new ArrayList<>();
-		for (String word : line) {
-			//check if word is stored in inverted index
-			if (contains(word)) {
-				for (String path : get(word)) {
-//				//create search result object
-//				temp.putIfAbsent(path, new SingleSearchResult(path, InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
-//				temp.get(path).setMatches(get(word, path).size());
-					if (!temp.containsKey(path)) {
-						temp.put(path, new SingleSearchResult(path, InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
-					}
-					else {
-						temp.get(path).setMatches(get(word, path).size());
-					}
-				}
-			}
-		}
-		listExact = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
-		Collections.sort(listExact);
-		return listExact;
-	}
-	
-	public List<SingleSearchResult> partialSearch(TreeSet<String> line) {
-		Map<String, SingleSearchResult> temp = new TreeMap<>();
-		List<SingleSearchResult> listPartial = new ArrayList<>();
-		for (String word : line) {
-			var iterator = map.entrySet().iterator();
-			while (iterator.hasNext()) {
-				var entry = iterator.next();
-				if (entry.getKey().startsWith(word)) {
-					for (String path : get(word)) {
-						if (!temp.containsKey(path)) {
-							temp.put(path, new SingleSearchResult(path, 
-									InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
-						} 
-						else {
-							temp.get(path).setMatches(get(word, path).size());
-						}
-					}
-				}
-			}
-		}
-//			for (var key : map.entrySet()) {
-//				if (key.getKey().startsWith(word)) {
-//					for (String path : get(word)) {
-//						if (!temp.containsKey(path)) {
-//							temp.put(path, new SingleSearchResult(path, 
-//									InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
-//						}
-//						else {
-//							temp.get(path).setMatches(get(word, path).size());
-//						}
-//					}
-//				}
-//			}
-//		}
-		listPartial = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
-		Collections.sort(listPartial);
-		System.out.println(listPartial);
-		return listPartial;
-	}
-	
+	}	
 }

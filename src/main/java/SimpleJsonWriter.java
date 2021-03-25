@@ -5,7 +5,6 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -178,92 +177,6 @@ public class SimpleJsonWriter {
 		}
 		else {
 			writer.write('}');
-		}
-	}
-
-	public static void asResult(Collection<SingleSearchResult> elements, Writer writer, int level) throws IOException {		
-		if (!elements.isEmpty()) {
-			Iterator<SingleSearchResult> iterator = elements.iterator();
-			SingleSearchResult first = iterator.next();
-			SimpleJsonWriter.writeCollection(first, writer, level);
-			while (iterator.hasNext()) {
-				writer.write(',');
-				writer.write('\n');
-				SingleSearchResult next = iterator.next();
-				SimpleJsonWriter.writeCollection(next, writer, level);
-			}
-		}
-	}
-	
-	public static void writeCollection(SingleSearchResult item, Writer writer, int level) {
-		try {
-			DecimalFormat FORMATTER = new DecimalFormat("0.00000000");
-			indent("{", writer, level+1);
-			writer.write('\n');
-			quote("where", writer, level+2);
-			writer.write(": ");
-			quote(item.getLocation(), writer, level-1);
-			writer.write(',');
-			writer.write('\n');
-			quote("count", writer, level+2);
-			writer.write(": ");
-			writer.write(item.getMatches());
-			writer.write(',');
-			writer.write('\n');
-			quote("score", writer, level+2);
-			writer.write(": ");
-			writer.write(FORMATTER.format(item.getScore()));
-			writer.write('\n');
-			indent("}", writer, level+1);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static void asNestedResult(Map<String, ? extends Collection<SingleSearchResult>> elements, Writer writer,
-			int level) throws IOException {
-		writer.write("{");
-		writer.write('\n');
-		if (!elements.isEmpty()) {
-			var iterator = elements.entrySet().iterator();		
-			var entry1 = iterator.next();
-			SimpleJsonWriter.writeResultEntry(entry1, writer, level);
-			while (iterator.hasNext()) {
-				var entry2 = iterator.next();
-				writer.write(',');
-				writer.write('\n');
-				SimpleJsonWriter.writeResultEntry(entry2, writer, level);
-			}	
-			writer.write('\n');
-			writer.write('}');
-		}
-	}
-	
-	public static void writeResultEntry(
-			Entry<String, ? extends Collection<SingleSearchResult>> entry, Writer writer, int level) {
-		try {
-			quote(entry.getKey(), writer, 1);
-			writer.write(": ");
-			writer.write("[");
-			if (!entry.getValue().isEmpty()) {
-				writer.write('\n');
-				SimpleJsonWriter.asResult(entry.getValue(), writer, 1);
-			}
-			writer.write('\n');
-			indent("]", writer, 1);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static void asNestedResult(
-			Map<String, ? extends Collection<SingleSearchResult>> elements, Path path) 
-			throws IOException {
-		try (
-				BufferedWriter writer = Files.newBufferedWriter(path,
-						StandardCharsets.UTF_8)
-		) {
-			asNestedResult(elements, writer, 0);
 		}
 	}
 	

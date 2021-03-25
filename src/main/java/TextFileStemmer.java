@@ -88,7 +88,6 @@ public class TextFileStemmer {
 			ArrayList<String> list = new ArrayList<>();
 			Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
 			String line = null;
-			// only 1 line needs to be "in memory" at a time
 			while ((line = read.readLine()) != null) {
 				stemLine(line, stemmer, list);
 			}
