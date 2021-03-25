@@ -61,16 +61,24 @@ public class InvertedIndexBuilder {
 	
 	public static Map<String, List<SingleSearchResult>> results = new TreeMap<>();
 	
-	public void parseQuery(Path path) throws IOException {
+	public void parseQuery(Path path, boolean exact) throws IOException {
 		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
 			String line;
 			while ((line = read.readLine()) != null) {
 				//assigns set a set of unique, cleaned and stemmed words parsed from line
 				TreeSet<String> set = TextFileStemmer.uniqueStems(line);
-				if (!set.isEmpty()) {
-					//puts a new string from set separated by spaces as key and list of search results as value
-					results.put(String.join(" ", set), invertedIndex.exactSearch(set));
+				if (exact == true) {
+					if (!set.isEmpty()) {
+						//puts a new string from set separated by spaces as key and list of search results as value
+						results.put(String.join(" ", set), invertedIndex.exactSearch(set));
+					}
 				}
+//				else {
+//					if (!set.isEmpty()) {
+//						//puts a new string from set separated by spaces as key and list of search results as value
+//						results.put(String.join(" ", set), invertedIndex.partialSearch(set));
+//					}
+//				}
 			}
 		}
 //		System.out.println(results);

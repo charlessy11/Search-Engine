@@ -73,15 +73,14 @@ public class Driver {
 		//indicates the next argument is a path to a text file of queries to be used for search
 		if (map.hasFlag("-query")) {
 			try {
-				builder.parseQuery(map.getPath("-query"));
+//				builder.parseQuery(map.getPath("-query"));
 				//optional flag that indicates all search operations performed should be exact search
 				if (map.hasFlag("-exact")) {
-//					invertedIndex.exactSearch(null) 
+					builder.parseQuery(map.getPath("-query"), true);
 				}
-				
 				//partial search
 				else {
-					
+					builder.parseQuery(map.getPath("-query"), false);
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
