@@ -16,19 +16,32 @@ import java.nio.charset.StandardCharsets;
  */
 public class InvertedIndexBuilder {
 	
+	/**
+	 * Stores word count
+	 */
 	public static TreeMap<String, Integer> wordCount = new TreeMap<>();
 	
+	/**
+	 * The inverted index to build
+	 */
 	InvertedIndex invertedIndex;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param invertedIndex the inverted index to build
+	 */
 	public InvertedIndexBuilder(InvertedIndex invertedIndex) {
 		this.invertedIndex = invertedIndex;
 	}
+	
 	/**
 	 * Parses stemmed and cleaned words from file then 
 	 * adds word, location, and position to inverted index.
 	 * 
 	 * @param invertedIndex the inverted index to add information into
 	 * @param path the path of the file
-	 * @throws IOException 
+	 * @throws IOException if an IO error occurs
 	 */
 	public void add(InvertedIndex invertedIndex, Path path) throws IOException {
 		//check if path is a regular file
@@ -59,8 +72,18 @@ public class InvertedIndexBuilder {
 		}
 	}
 	
+	/**
+	 * Stores single search results
+	 */
 	public static Map<String, Collection<SingleSearchResult>> results = new TreeMap<>();
 	
+	/**
+	 * Cleans, parses and sorts each query line
+	 * 
+	 * @param path the path of the file
+	 * @param exact to check if exact/partial search
+	 * @throws IOException if an IO error occurs
+	 */
 	public void parseQuery(Path path, boolean exact) throws IOException {
 		results.clear();
 		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
@@ -76,12 +99,10 @@ public class InvertedIndexBuilder {
 				}
 				else {
 					if (!set.isEmpty()) {
-						//puts a new string from set separated by spaces as key and list of search results as value
 						results.put(String.join(" ", set), invertedIndex.partialSearch(set));
 					}
 				}
 			}
 		}
-//		System.out.println(results);
 	}	
 }

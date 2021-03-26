@@ -12,10 +12,6 @@ import java.time.Instant;
  * @version Spring 2021
  */
 public class Driver {
-	
-//	private static final Charset UTF8 = null;
-//	/** The stemmer to use for the cleaning methods. */
-//	public static final Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
 
 	/**
 	 * Initializes the classes necessary based on the provided command-line
@@ -28,11 +24,8 @@ public class Driver {
 		// store initial start time
 		Instant start = Instant.now();
 
-		//build argument map
 		ArgumentMap map = new ArgumentMap(args); //parses command-line arguments
-		//build inverted index
 		InvertedIndex invertedIndex = new InvertedIndex();
-		
 		InvertedIndexBuilder builder = new InvertedIndexBuilder(invertedIndex);
 		
 		InvertedIndexBuilder.wordCount.clear();
@@ -49,12 +42,11 @@ public class Driver {
 			System.out.println("Warning: No value given to -text flag");
 		}
 		
-		
 		//check for optional flag
 		if (map.hasFlag("-index")) {
 			try {
 				//use given path (or index.json as the default output path) to print inverted index as JSON
-				InvertedIndex.toJson(invertedIndex, map.getPath("-index", Path.of("index.json")));
+				invertedIndex.toJson(map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
 			}
@@ -70,10 +62,9 @@ public class Driver {
 			}
 		}
 		
-		//indicates the next argument is a path to a text file of queries to be used for search
+		//indicates that a search should be performed
 		if (map.hasFlag("-query") && map.hasValue("-query")) {
 			try {
-//				builder.parseQuery(map.getPath("-query"));
 				//optional flag that indicates all search operations performed should be exact search
 				if (map.hasFlag("-exact")) {
 					builder.parseQuery(map.getPath("-query"), true);
@@ -83,12 +74,8 @@ public class Driver {
 					builder.parseQuery(map.getPath("-query"), false);
 				}
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("Error: No search performed.");
 			}
-		}
-		//no search should be performed
-		else if (!map.hasFlag("-query")) {
-			System.out.println("Warning: No value given to -query flag, therfore no search to be performed.");
 		}
 		
 		//optional flag that indicates the next argument is the path to use for the search results output file
@@ -96,7 +83,7 @@ public class Driver {
 			try {
 				SimpleJsonWriter.asNestedResult(InvertedIndexBuilder.results, map.getPath("-results", Path.of("results.json")));
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("Warning: No output file produced of search results but still performed the search operation..");
 			}
 		}
 		

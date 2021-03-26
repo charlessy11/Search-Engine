@@ -16,8 +16,6 @@ import java.util.stream.Stream;
  * @version Spring 2021
  */
 public class TextFileFinder {
-//	static Path p;
-//	static String lower = p.toString().toLowerCase();
 	/**
 	 * A lambda function that returns true if the path is a file that ends in a
 	 * .txt or .text extension (case-insensitive). Useful for
@@ -27,9 +25,9 @@ public class TextFileFinder {
 	 * @see Path#getFileName()
 	 * @see Files#walk(Path, FileVisitOption...)
 	 */
-	public static final Predicate<Path> IS_TEXT = p -> (p.toString().toLowerCase().endsWith(".txt") || 
-			p.toString().toLowerCase().endsWith(".text")) && Files.isRegularFile(p);
-	// TODO Reuse lower in both endsWith tests... use { } in the lambda expression
+	public static final Predicate<Path> IS_TEXT = p -> {
+		String lower = p.toString().toLowerCase();
+		return (lower.endsWith(".txt") || lower.endsWith(".text")) && Files.isRegularFile(p);};
 	
 	/**
 	 * If provided a directory, returns a stream of all text files within that

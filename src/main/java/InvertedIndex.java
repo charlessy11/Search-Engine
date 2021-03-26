@@ -18,11 +18,10 @@ import java.util.Set;
  *
  */
 public class InvertedIndex {
-	// TODO private
 	/**
 	 * Multiple-leveled nested TreeMap that serves as an inverted index
 	 */
-	public final Map <String, Map<String, Set<Integer>>> map;
+	private final Map <String, Map<String, Set<Integer>>> map;
 	
 	/**
 	 * Constructor defines map
@@ -44,11 +43,6 @@ public class InvertedIndex {
 		map.get(word).get(location).add(position);
 	}
 	
-//	public static void count(String location, Integer counter) {
-//		TreeMap<String, Integer> wordCount = new TreeMap<>();
-//		wordCount.put(location, counter);
-//		SimpleJsonWriter.asObject(wordCount, map.getPath("-counts", Path.of("counts.json")));
-//	}
 	/**
 	 * Returns the number of words stored in the index.
 	 *
@@ -180,43 +174,26 @@ public class InvertedIndex {
 	/**
 	 * Calls SimpleJsonWriter's asInvertedIndex method
 	 * 
-	 * @param invertedIndex the inverted index
 	 * @param path the path given by user or default path if otherwise
-	 * @throws IOException
+	 * @throws IOException if an IO error occurs
 	 */
-	public static void toJson(InvertedIndex elements, Path path) throws IOException {
-		SimpleJsonWriter.asInvertedIndex(elements, path);
+	public void toJson(Path path) throws IOException {
+		SimpleJsonWriter.asInvertedIndex(map, path);
 	}
 	
+	/**
+	 * Performs exact search
+	 * 
+	 * @param line the parsed words from a single line of the query file
+	 * @return sorted list of search results
+	 */
 	public List<SingleSearchResult> exactSearch(TreeSet<String> line) {
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> listExact = new ArrayList<>();
 		for (String word : line) {
-//			var iterator = map.entrySet().iterator();
-//			while (iterator.hasNext()) {
-//				var entry = iterator.next();
-//				if (contains(word)) {
-//					for (String path : get(word)) {
-//						if (!temp.containsKey(path)) {
-////							temp.put(path, new SingleSearchResult(path, InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
-//							SingleSearchResult results = new SingleSearchResult(path, InvertedIndexBuilder.wordCount.get(path), 
-//									get(word, path).size());
-//							listExact.add(results);
-//							temp.put(path, results);
-//						} 
-//						else {
-//							temp.get(path).setMatches(get(word, path).size());
-////							temp.get(path).setMatches(map.get(entry.getKey()).get(path).size());
-//						}
-//					}
-//				}
-//			}
 			//check if word is stored in inverted index
 			if (contains(word)) {
 				for (String path : get(word)) {
-//				//create search result object
-//				temp.putIfAbsent(path, new SingleSearchResult(path, InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
-//				temp.get(path).setMatches(get(word, path).size());
 					if (!temp.containsKey(path)) {
 						temp.put(path, new SingleSearchResult(path, InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
 					}
@@ -231,6 +208,12 @@ public class InvertedIndex {
 		return listExact;
 	}
 	
+	/**
+	 * Performs partial search
+	 * 
+	 * @param line the parsed words from a single line of the query file
+	 * @return sorted list of search results
+	 */
 	public List<SingleSearchResult> partialSearch(TreeSet<String> line) {
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> listPartial = new ArrayList<>();
@@ -240,7 +223,6 @@ public class InvertedIndex {
 				var entry = iterator.next();
 				if (entry.getKey().startsWith(word)) {
 					for (String path : get(entry.getKey())) {
-//						System.out.println(word +" "+ entry.getKey()+" "+path);
 						if (!temp.containsKey(path)) {
 				
 							temp.put(path, new SingleSearchResult(path, 
@@ -253,24 +235,8 @@ public class InvertedIndex {
 				}
 			}
 		}
-//			for (var key : map.entrySet()) {
-//				if (key.getKey().startsWith(word)) {
-//					for (String path : get(word)) {
-//						if (!temp.containsKey(path)) {
-//							temp.put(path, new SingleSearchResult(path, 
-//									InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
-//						}
-//						else {
-//							temp.get(path).setMatches(get(word, path).size());
-//						}
-//					}
-//				}
-//			}
-//		}
 		listPartial = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
 		Collections.sort(listPartial);
-//		System.out.println(listPartial);
 		return listPartial;
 	}
-	
 }
