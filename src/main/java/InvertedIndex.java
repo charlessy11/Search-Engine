@@ -15,11 +15,10 @@ import java.util.Set;
  *
  */
 public class InvertedIndex {
-	// TODO private
 	/**
 	 * Multiple-leveled nested TreeMap that serves as an inverted index
 	 */
-	public final Map <String, Map<String, Set<Integer>>> map;
+	private final Map <String, Map<String, Set<Integer>>> map;
 	
 	/**
 	 * Constructor defines map
@@ -41,11 +40,6 @@ public class InvertedIndex {
 		map.get(word).get(location).add(position);
 	}
 	
-//	public static void count(String location, Integer counter) {
-//		TreeMap<String, Integer> wordCount = new TreeMap<>();
-//		wordCount.put(location, counter);
-//		SimpleJsonWriter.asObject(wordCount, map.getPath("-counts", Path.of("counts.json")));
-//	}
 	/**
 	 * Returns the number of words stored in the index.
 	 *
@@ -177,11 +171,10 @@ public class InvertedIndex {
 	/**
 	 * Calls SimpleJsonWriter's asInvertedIndex method
 	 * 
-	 * @param invertedIndex the inverted index
 	 * @param path the path given by user or default path if otherwise
 	 * @throws IOException
 	 */
-	public static void toJson(InvertedIndex elements, Path path) throws IOException {
-		SimpleJsonWriter.asInvertedIndex(elements, path);
+	public void toJson(Path path) throws IOException {
+		SimpleJsonWriter.asInvertedIndex(map, path);
 	}	
 }

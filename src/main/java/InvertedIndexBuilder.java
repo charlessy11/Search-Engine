@@ -11,6 +11,12 @@ import java.nio.file.Path;
 public class InvertedIndexBuilder {
 	
 	InvertedIndex invertedIndex;
+	
+	/**
+	 * Constructor
+	 * 
+	 * @param invertedIndex the inverted index
+	 */
 	public InvertedIndexBuilder(InvertedIndex invertedIndex) {
 		this.invertedIndex = invertedIndex;
 	}

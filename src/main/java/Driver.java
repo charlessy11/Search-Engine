@@ -28,11 +28,8 @@ public class Driver {
 		// store initial start time
 		Instant start = Instant.now();
 
-		//build argument map
 		ArgumentMap map = new ArgumentMap(args); //parses command-line arguments
-		//build inverted index
 		InvertedIndex invertedIndex = new InvertedIndex();
-		
 		InvertedIndexBuilder builder = new InvertedIndexBuilder(invertedIndex);
 		
 		
@@ -53,7 +50,7 @@ public class Driver {
 		if (map.hasFlag("-index")) {
 			try {
 				//use given path (or index.json as the default output path) to print inverted index as JSON
-				InvertedIndex.toJson(invertedIndex, map.getPath("-index", Path.of("index.json")));
+				invertedIndex.toJson(map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
 			}
