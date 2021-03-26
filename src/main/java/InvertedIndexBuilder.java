@@ -19,7 +19,7 @@ public class InvertedIndexBuilder {
 	/**
 	 * Stores word count
 	 */
-	public static TreeMap<String, Integer> wordCount = new TreeMap<>();
+	private final TreeMap<String, Integer> wordCount = new TreeMap<>();
 	
 	/**
 	 * The inverted index to build
@@ -75,7 +75,7 @@ public class InvertedIndexBuilder {
 	/**
 	 * Stores single search results
 	 */
-	public static Map<String, Collection<SingleSearchResult>> results = new TreeMap<>();
+	private final Map<String, Collection<SingleSearchResult>> results = new TreeMap<>();
 	
 	/**
 	 * Cleans, parses and sorts each query line
@@ -104,5 +104,25 @@ public class InvertedIndexBuilder {
 				}
 			}
 		}
-	}	
+	}
+	
+	/**
+	 * Calls SimpleJsonWriter's asObject method
+	 * 
+	 * @param path the path given by user or default path if otherwise
+	 * @throws IOException if an IO error occurs
+	 */
+	public void toJsonObject(Path path) throws IOException {
+		SimpleJsonWriter.asObject(wordCount, path);
+	}
+	
+	/**
+	 * Calls SimpleJsonWriter's asNestedResult method
+	 * 
+	 * @param path the path given by user or default path if otherwise
+	 * @throws IOException if an IO error occurs
+	 */
+	public void toJsonNestedResult(Path path) throws IOException {
+		SimpleJsonWriter.asNestedResult(results, path);
+	}
 }

@@ -28,7 +28,7 @@ public class Driver {
 		InvertedIndex invertedIndex = new InvertedIndex();
 		InvertedIndexBuilder builder = new InvertedIndexBuilder(invertedIndex);
 		
-		InvertedIndexBuilder.wordCount.clear();
+//		InvertedIndexBuilder.wordCount.clear();
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
@@ -46,7 +46,7 @@ public class Driver {
 		if (map.hasFlag("-index")) {
 			try {
 				//use given path (or index.json as the default output path) to print inverted index as JSON
-				invertedIndex.toJson(map.getPath("-index", Path.of("index.json")));
+				invertedIndex.toJsonInvertedIndex(map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
 			}
@@ -56,7 +56,8 @@ public class Driver {
 		if (map.hasFlag("-counts")) {
 			try {
 				//use given path (or counts.json as the default output path) to print pretty JSON
-				SimpleJsonWriter.asObject(InvertedIndexBuilder.wordCount, map.getPath("-counts", Path.of("counts.json")));
+				builder.toJsonObject(map.getPath("-counts", Path.of("counts.json")));
+//				SimpleJsonWriter.asObject(InvertedIndexBuilder.wordCount, map.getPath("-counts", Path.of("counts.json")));
 			} catch (IOException e) {
 				System.out.println("Error: Unable to calculate total amount of stemmed words.");
 			}
@@ -81,7 +82,7 @@ public class Driver {
 		//optional flag that indicates the next argument is the path to use for the search results output file
 		if (map.hasFlag("-results")) {
 			try {
-				SimpleJsonWriter.asNestedResult(InvertedIndexBuilder.results, map.getPath("-results", Path.of("results.json")));
+				builder.toJsonNestedResult(map.getPath("-results", Path.of("results.json")));
 			} catch (IOException e) {
 				System.out.println("Warning: No output file produced of search results but still performed the search operation..");
 			}

@@ -177,9 +177,10 @@ public class InvertedIndex {
 	 * @param path the path given by user or default path if otherwise
 	 * @throws IOException if an IO error occurs
 	 */
-	public void toJson(Path path) throws IOException {
+	public void toJsonInvertedIndex(Path path) throws IOException {
 		SimpleJsonWriter.asInvertedIndex(map, path);
 	}
+	
 	
 	/**
 	 * Performs exact search
