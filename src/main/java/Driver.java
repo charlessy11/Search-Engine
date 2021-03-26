@@ -28,8 +28,6 @@ public class Driver {
 		InvertedIndex invertedIndex = new InvertedIndex();
 		InvertedIndexBuilder builder = new InvertedIndexBuilder(invertedIndex);
 		
-//		InvertedIndexBuilder.wordCount.clear();
-		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
 			try {
@@ -56,8 +54,7 @@ public class Driver {
 		if (map.hasFlag("-counts")) {
 			try {
 				//use given path (or counts.json as the default output path) to print pretty JSON
-				builder.toJsonObject(map.getPath("-counts", Path.of("counts.json")));
-//				SimpleJsonWriter.asObject(InvertedIndexBuilder.wordCount, map.getPath("-counts", Path.of("counts.json")));
+				invertedIndex.toJsonObject(map.getPath("-counts", Path.of("counts.json")));
 			} catch (IOException e) {
 				System.out.println("Error: Unable to calculate total amount of stemmed words.");
 			}

@@ -17,11 +17,6 @@ import java.nio.charset.StandardCharsets;
 public class InvertedIndexBuilder {
 	
 	/**
-	 * Stores word count
-	 */
-	private final TreeMap<String, Integer> wordCount = new TreeMap<>();
-	
-	/**
 	 * The inverted index to build
 	 */
 	InvertedIndex invertedIndex;
@@ -34,6 +29,7 @@ public class InvertedIndexBuilder {
 	public InvertedIndexBuilder(InvertedIndex invertedIndex) {
 		this.invertedIndex = invertedIndex;
 	}
+	
 	
 	/**
 	 * Parses stemmed and cleaned words from file then 
@@ -53,9 +49,6 @@ public class InvertedIndexBuilder {
 				invertedIndex.add(word, path.toString(), position);
 				position++;
 			}
-			if (position > 1) {
-				wordCount.put(path.toString(), position-1);
-			}
 		}
 		else if(Files.isDirectory(path)) {
 			//get each file from list of text files
@@ -65,7 +58,6 @@ public class InvertedIndexBuilder {
 				for (String word : TextFileStemmer.listStems(file)) {
 					//add word, location, and position to inverted index
 					invertedIndex.add(word, file.toString(), position);
-					wordCount.put(file.toString(), position);
 					position++; //increment counter
 				}
 			}
@@ -106,15 +98,6 @@ public class InvertedIndexBuilder {
 		}
 	}
 	
-	/**
-	 * Calls SimpleJsonWriter's asObject method
-	 * 
-	 * @param path the path given by user or default path if otherwise
-	 * @throws IOException if an IO error occurs
-	 */
-	public void toJsonObject(Path path) throws IOException {
-		SimpleJsonWriter.asObject(wordCount, path);
-	}
 	
 	/**
 	 * Calls SimpleJsonWriter's asNestedResult method

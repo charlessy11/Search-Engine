@@ -24,14 +24,20 @@ public class InvertedIndex {
 	private final Map <String, Map<String, Set<Integer>>> map;
 	
 	/**
+	 * Stores word count
+	 */
+	private final TreeMap<String, Integer> wordCount;
+	
+	/**
 	 * Constructor defines map
 	 */
 	public InvertedIndex() {
 		this.map = new TreeMap<String, Map<String, Set<Integer>>>(); 
+		this.wordCount =  new TreeMap<>();
 	}
 	
 	/**
-	 * Adds the word, location, and position.
+	 * Adds the word, location, position and updates the word count.
 	 *
 	 * @param word the word found
 	 * @param location the location the word was found
@@ -41,6 +47,7 @@ public class InvertedIndex {
 		map.putIfAbsent(word, new TreeMap<>());
 		map.get(word).putIfAbsent(location, new TreeSet<>());
 		map.get(word).get(location).add(position);
+		wordCount.put(location, position);
 	}
 	
 	/**
@@ -196,7 +203,8 @@ public class InvertedIndex {
 			if (contains(word)) {
 				for (String path : get(word)) {
 					if (!temp.containsKey(path)) {
-						temp.put(path, new SingleSearchResult(path, InvertedIndexBuilder.wordCount.get(path), get(word, path).size()));
+						temp.put(path, 
+								new SingleSearchResult(path, wordCount.get(path), get(word, path).size()));
 					}
 					else {
 						temp.get(path).setMatches(get(word, path).size());
@@ -225,9 +233,8 @@ public class InvertedIndex {
 				if (entry.getKey().startsWith(word)) {
 					for (String path : get(entry.getKey())) {
 						if (!temp.containsKey(path)) {
-				
 							temp.put(path, new SingleSearchResult(path, 
-									InvertedIndexBuilder.wordCount.get(path), get(entry.getKey(), path).size()));
+									wordCount.get(path), get(entry.getKey(), path).size()));
 						} 
 						else {
 							temp.get(path).setMatches(get(entry.getKey(), path).size());
@@ -239,5 +246,15 @@ public class InvertedIndex {
 		listPartial = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
 		Collections.sort(listPartial);
 		return listPartial;
+	}
+	
+	/**
+	 * Calls SimpleJsonWriter's asObject method
+	 * 
+	 * @param path the path given by user or default path if otherwise
+	 * @throws IOException if an IO error occurs
+	 */
+	public void toJsonObject(Path path) throws IOException {
+		SimpleJsonWriter.asObject(wordCount, path);
 	}
 }
