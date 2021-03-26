@@ -10,6 +10,9 @@ import java.nio.file.Path;
  */
 public class InvertedIndexBuilder {
 	
+	/**
+	 * The inverted index to build
+	 */
 	InvertedIndex invertedIndex;
 	
 	/**
@@ -26,7 +29,7 @@ public class InvertedIndexBuilder {
 	 * 
 	 * @param invertedIndex the inverted index to add information into
 	 * @param path the path of the file
-	 * @throws IOException 
+	 * @throws IOException if an IO error occurs
 	 */
 	public void add(InvertedIndex invertedIndex, Path path) throws IOException {
 		//check if path is a regular file

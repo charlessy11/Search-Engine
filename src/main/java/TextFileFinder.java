@@ -21,8 +21,6 @@ public class TextFileFinder {
 	 * .txt or .text extension (case-insensitive). Useful for
 	 * {@link Files#walk(Path, FileVisitOption...)}.
 	 * 
-	 * @return path that has ".text" or ".txt" extension
-	 *
 	 * @see Files#isRegularFile(Path, java.nio.file.LinkOption...)
 	 * @see Path#getFileName()
 	 * @see Files#walk(Path, FileVisitOption...)
