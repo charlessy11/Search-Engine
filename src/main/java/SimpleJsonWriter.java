@@ -10,8 +10,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
-// TODO Consider a more general name than asInvertedIndex since it works for other nested data structures too
+import java.util.TreeMap;
 
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
@@ -85,15 +84,12 @@ public class SimpleJsonWriter {
 	 * 
 	 * @param entry the entry to write
 	 * @param writer the writer to use
+	 * @throws IOException if an IO error occurs
 	 */
-	public static void writeEntry(Entry<String, Integer> entry, Writer writer) {
-		try {
-			quote(entry.getKey(), writer, 1);
-			writer.write(": ");
-			writer.write(entry.getValue().toString());
-		} catch (IOException e) { // TODO Remove try/catch block! No stack traces!
-			e.printStackTrace();
-		}
+	public static void writeEntry(Entry<String, Integer> entry, Writer writer) throws IOException {
+		quote(entry.getKey(), writer, 1);
+		writer.write(": ");
+		writer.write(entry.getValue().toString());
 	}
 
 	/**
@@ -135,15 +131,12 @@ public class SimpleJsonWriter {
 	 * @param entry the entry to write
 	 * @param writer the writer to use
 	 * @param level the level to use
+	 * @throws IOException if an IO error occurs
 	 */
-	public static void writeEntry(Entry<String, ? extends Collection<Integer>> entry, Writer writer, int level) {
-		try {
-			quote(entry.getKey(), writer, level);
-			writer.write(": ");
-			SimpleJsonWriter.asArray(entry.getValue(), writer, level);
-		} catch (IOException e) { // TODO Same as before
-			e.printStackTrace();
-		}
+	public static void writeEntry(Entry<String, ? extends Collection<Integer>> entry, Writer writer, int level) throws IOException {
+		quote(entry.getKey(), writer, level);
+		writer.write(": ");
+		SimpleJsonWriter.asArray(entry.getValue(), writer, level);
 	}
 	
 	/**
@@ -154,7 +147,7 @@ public class SimpleJsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void asInvertedIndex(Map<String, Map<String, Set<Integer>>> elements, Writer writer,
+	public static void asNested(Map<String, TreeMap<String, Set<Integer>>> elements, Writer writer,
 			int level) throws IOException {
 		writer.write('{');
 		writer.write('\n');
@@ -246,12 +239,12 @@ public class SimpleJsonWriter {
 	 * @param path the file path to use
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void asInvertedIndex(Map <String, Map<String, Set<Integer>>> elements, Path path) throws IOException {
+	public static void asNested(Map<String, TreeMap<String, Set<Integer>>> elements, Path path) throws IOException {
 		try (
 				BufferedWriter writer = Files.newBufferedWriter(path,
 						StandardCharsets.UTF_8)
 		) {
-			asInvertedIndex(elements, writer, 0);
+			asNested(elements, writer, 0);
 		}	
 	}
 
@@ -320,10 +313,10 @@ public class SimpleJsonWriter {
 	 * @return a {@link String} containing the elements in pretty JSON format
 	 *
 	 */
-	public static String asInvertedIndex(Map <String, Map<String, Set<Integer>>> elements) {
+	public static String asNested(Map<String, TreeMap<String, Set<Integer>>> elements) {
 		try {
 			StringWriter writer = new StringWriter();
-			asInvertedIndex(elements, writer, 0);
+			asNested(elements, writer, 0);
 			return writer.toString();
 		}
 		catch (IOException e) {

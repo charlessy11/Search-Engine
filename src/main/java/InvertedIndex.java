@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -15,17 +14,16 @@ import java.util.Set;
  *
  */
 public class InvertedIndex {
-	// TODO Upcasting is almost always the right approach, but you'll want a TreeMap reference for project 2.
 	/**
 	 * Multiple-leveled nested TreeMap that serves as an inverted index
 	 */
-	private final Map <String, Map<String, Set<Integer>>> map; // TODO Formatting
+	private final TreeMap<String, TreeMap<String, Set<Integer>>> map;
 	
 	/**
 	 * Constructor defines map
 	 */
 	public InvertedIndex() {
-		this.map = new TreeMap<String, Map<String, Set<Integer>>>(); 
+		this.map = new TreeMap<String, TreeMap<String, Set<Integer>>>(); 
 	}
 	
 	/**
@@ -74,7 +72,7 @@ public class InvertedIndex {
 	 *         the number of words stored for that element
 	 */
 	public int size(String word, String location) {
-		if (map.get(word).get(location) != null) { // TODO Has a null pointer on this line. (Test on an empty map.) Use your contains(...) method instead. 
+		if (contains(word, location)) {
 			return map.get(word).get(location).size();
 		}
 		return -1;
@@ -99,11 +97,7 @@ public class InvertedIndex {
 	 * @return {@true} if the location and word is stored in the index
 	 */
 	public boolean contains(String word, String location) {
-		// TODO Condense into single return statement
-		if (map.containsKey(word) && map.get(word).containsKey(location)) {
-			return true;
-		}
-		return false;
+		return (map.containsKey(word) && map.get(word).containsKey(location));
 	}
 	
 	/**
@@ -116,12 +110,7 @@ public class InvertedIndex {
 	 * @return {@true} if the location and word is stored in the index
 	 */
 	public boolean contains(String word, String location, Integer position) {
-		// TODO Condense into single return statement
-		// TODO Reuse your other contains method to reduce duplicate code
-		if (map.containsKey(word) && map.get(word).containsKey(location) && map.get(word).get(location).contains(position)) {
-			return true;
-		}
-		return false;
+		return (contains(word, location) && map.get(word).get(location).contains(position));
 	}
 	
 	/**
@@ -161,7 +150,7 @@ public class InvertedIndex {
 	 * @see Collections#unmodifiableCollection(Collection)
 	 */
 	public Collection<Integer> get(String word, String location) {
-		if (map.containsKey(word) && map.get(word).containsKey(location)) { // TODO Use contains method
+		if (contains(word, location)) { 
 			return Collections.unmodifiableCollection(map.get(word).get(location));
 		}
 		return Collections.emptySet();
@@ -179,12 +168,20 @@ public class InvertedIndex {
 	 * @throws IOException if an IO error occurs
 	 */
 	public void toJson(Path path) throws IOException {
-		SimpleJsonWriter.asInvertedIndex(map, path);
+		SimpleJsonWriter.asNested(map, path);
 	}
 	
-	/*
-	 * TODO Consider also adding an addAll convenience method such that given a
-	 * list of words and the location/path they came from, it adds each to the
-	 * inverted index using the list index as the position. 
+	/**
+	 * Convenience method to add all words, location, and position to the inverted index
+	 * 
+	 * @param words the list of words
+	 * @param path the path of the list
 	 */
+	public void addAll(Collection<String> words, Path path) {
+		int position = 1;
+		for (String word : words) {
+			add(word, path.toString(), position);
+			position++;
+		}
+	}
 }
