@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+// TODO Consider a more general name than asInvertedIndex since it works for other nested data structures too
+
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
  * are used to separate elements and nested elements are indented using tabs.
@@ -89,7 +91,7 @@ public class SimpleJsonWriter {
 			quote(entry.getKey(), writer, 1);
 			writer.write(": ");
 			writer.write(entry.getValue().toString());
-		} catch (IOException e) {
+		} catch (IOException e) { // TODO Remove try/catch block! No stack traces!
 			e.printStackTrace();
 		}
 	}
@@ -139,7 +141,7 @@ public class SimpleJsonWriter {
 			quote(entry.getKey(), writer, level);
 			writer.write(": ");
 			SimpleJsonWriter.asArray(entry.getValue(), writer, level);
-		} catch (IOException e) {
+		} catch (IOException e) { // TODO Same as before
 			e.printStackTrace();
 		}
 	}
@@ -162,7 +164,7 @@ public class SimpleJsonWriter {
 			var first = iterator.next();
 			quote(first, writer, level+1);
 			writer.write(": ");
-			SimpleJsonWriter.asNestedArray(elements.get(first), writer, level+2);
+			SimpleJsonWriter.asNestedArray(elements.get(first), writer, level+2); // TODO Formatting here and everywhere
 			while (iterator.hasNext()) {
 				var next = iterator.next();
 				writer.write(',');

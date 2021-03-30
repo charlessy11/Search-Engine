@@ -13,7 +13,7 @@ public class InvertedIndexBuilder {
 	/**
 	 * The inverted index to build
 	 */
-	InvertedIndex invertedIndex;
+	InvertedIndex invertedIndex; // TODO Missing keywords 
 	
 	/**
 	 * Constructor
@@ -23,6 +23,8 @@ public class InvertedIndexBuilder {
 	public InvertedIndexBuilder(InvertedIndex invertedIndex) {
 		this.invertedIndex = invertedIndex;
 	}
+	
+	// TODO Why should the method below take in the inverted index if you save it as a parameter of the class?
 	/**
 	 * Parses stemmed and cleaned words from file then 
 	 * adds word, location, and position to inverted index.
@@ -55,4 +57,23 @@ public class InvertedIndexBuilder {
 			}
 		}
 	}
+	
+	/*
+	 * TODO Move the duplicate code above into a separate method.
+	 */
+	
+	/*
+	 * TODO Whenever you move data from one data structure (like a list) into
+	 * another data structure (like an inverted index), there is an efficiency
+	 * issue caused by the extra time and space the copy operation takes.
+	 *
+	 * This is a classic case where reusing your general code (in this case from
+	 * TextFileStemmer) is not going to be the most efficient way forward. It is
+	 * for efficiency reasons that we often have to create a less-general solution.
+	 *
+	 * Copy over some of the parsing and stemming logic here so as soon as you have
+	 * a stemmed word, you add it directly to the inverted index instead of a list.
+	 * Keep TextFileStemmer around, it will be useful again soon.
+	 */
+
 }

@@ -12,6 +12,7 @@ import java.time.Instant;
  * @version Spring 2021
  */
 public class Driver {
+	// TODO Cleanup
 	
 //	private static final Charset UTF8 = null;
 //	/** The stemmer to use for the cleaning methods. */
@@ -38,6 +39,7 @@ public class Driver {
 			try {
 				builder.add(invertedIndex, map.getPath("-text"));
 			} catch (IOException e) {
+				// TODO Are you sure that is why the above failed? Consider a different message.
 				System.out.println("Error: Unable to open file.");
 			}
 		}
@@ -52,6 +54,7 @@ public class Driver {
 				//use given path (or index.json as the default output path) to print inverted index as JSON
 				invertedIndex.toJson(map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
+				// TODO Nice output, but the path output here might not be the path used above
 				System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
 			}
 		}
