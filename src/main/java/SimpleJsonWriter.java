@@ -64,12 +64,12 @@ public class SimpleJsonWriter {
 		if (!elements.isEmpty()) {
 			Iterator<Entry<String, Integer>> iterator = elements.entrySet().iterator();
 			var first = iterator.next();
-			SimpleJsonWriter.writeEntry(first, writer);
+			SimpleJsonWriter.writeObject(first, writer, level + 1);
 			while (iterator.hasNext()) {
 				var next = iterator.next();
 				writer.write(',');
 				writer.write('\n');
-				SimpleJsonWriter.writeEntry(next, writer);
+				SimpleJsonWriter.writeObject(next, writer, level + 1);
 			}
 			writer.write('\n');
 			writer.write('}');
@@ -84,10 +84,11 @@ public class SimpleJsonWriter {
 	 * 
 	 * @param entry the entry to write
 	 * @param writer the writer to use
+	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void writeEntry(Entry<String, Integer> entry, Writer writer) throws IOException {
-		quote(entry.getKey(), writer, 1);
+	public static void writeObject(Entry<String, Integer> entry, Writer writer, int level) throws IOException {
+		quote(entry.getKey(), writer, level);
 		writer.write(": ");
 		writer.write(entry.getValue().toString());
 	}
@@ -110,12 +111,12 @@ public class SimpleJsonWriter {
 		if (!elements.isEmpty()) {
 			var iterator = elements.entrySet().iterator();		
 			var first = iterator.next();
-			SimpleJsonWriter.writeEntry(first, writer, level);
+			SimpleJsonWriter.writeNestedArray(first, writer, level);
 			while (iterator.hasNext()) {
 				var next = iterator.next();
 				writer.write(',');
 				writer.write('\n');
-				SimpleJsonWriter.writeEntry(next, writer, level);
+				SimpleJsonWriter.writeNestedArray(next, writer, level);
 			}
 			writer.write('\n');
 			indent("}", writer, 1);
@@ -133,7 +134,7 @@ public class SimpleJsonWriter {
 	 * @param level the level to use
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void writeEntry(Entry<String, ? extends Collection<Integer>> entry, Writer writer, int level) throws IOException {
+	public static void writeNestedArray(Entry<String, ? extends Collection<Integer>> entry, Writer writer, int level) throws IOException {
 		quote(entry.getKey(), writer, level);
 		writer.write(": ");
 		SimpleJsonWriter.asArray(entry.getValue(), writer, level);
@@ -155,16 +156,16 @@ public class SimpleJsonWriter {
 		if (curr_size != elements.size()) {
 			var iterator = elements.keySet().iterator();
 			var first = iterator.next();
-			quote(first, writer, level+1);
+			quote(first, writer, level + 1);
 			writer.write(": ");
-			SimpleJsonWriter.asNestedArray(elements.get(first), writer, level+2); // TODO Formatting here and everywhere
+			SimpleJsonWriter.asNestedArray(elements.get(first), writer, level + 2); 
 			while (iterator.hasNext()) {
 				var next = iterator.next();
 				writer.write(',');
 				writer.write('\n');
 				quote(next, writer, 1);
 				writer.write(": ");
-				SimpleJsonWriter.asNestedArray(elements.get(next), writer, level+2);
+				SimpleJsonWriter.asNestedArray(elements.get(next), writer, level + 2);
 			}
 			writer.write('\n');
 			writer.write('}');
