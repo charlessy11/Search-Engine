@@ -212,23 +212,23 @@ public class SimpleJsonWriter {
 	public static void writeResult(SingleSearchResult entry, Writer writer, int level) {
 		try {
 			DecimalFormat FORMATTER = new DecimalFormat("0.00000000");
-			indent("{", writer, level+1);
+			indent("{", writer, level + 1);
 			writer.write('\n');
-			quote("where", writer, level+2);
+			quote("where", writer, level + 2);
 			writer.write(": ");
-			quote(entry.getLocation(), writer, level-1);
+			quote(entry.getLocation(), writer, level - 1);
 			writer.write(',');
 			writer.write('\n');
-			quote("count", writer, level+2);
+			quote("count", writer, level + 2);
 			writer.write(": ");
 			writer.write(Integer.toString(entry.getMatches()));
 			writer.write(',');
 			writer.write('\n');
-			quote("score", writer, level+2);
+			quote("score", writer, level + 2);
 			writer.write(": ");
 			writer.write(FORMATTER.format(entry.getScore()));
 			writer.write('\n');
-			indent("}", writer, level+1);
+			indent("}", writer, level + 1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -271,15 +271,15 @@ public class SimpleJsonWriter {
 	public static void writeNestedResult(
 			Entry<String, ? extends Collection<SingleSearchResult>> entry, Writer writer, int level) {
 		try {
-			quote(entry.getKey(), writer, 1);
+			quote(entry.getKey(), writer, level + 1);
 			writer.write(": ");
 			writer.write("[");
 			if (!entry.getValue().isEmpty()) {
 				writer.write('\n');
-				SimpleJsonWriter.asResult(entry.getValue(), writer, 1);
+				SimpleJsonWriter.asResult(entry.getValue(), writer, level + 1);
 			}
 			writer.write('\n');
-			indent("]", writer, 1);
+			indent("]", writer, level + 1);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
