@@ -109,7 +109,7 @@ public class SimpleJsonWriter {
 		writer.write('{');
 		writer.write('\n');
 		if (!elements.isEmpty()) {
-			var iterator = elements.entrySet().iterator();		
+			var iterator = elements.entrySet().iterator();
 			var first = iterator.next();
 			SimpleJsonWriter.writeNestedArray(first, writer, level);
 			while (iterator.hasNext()) {
@@ -163,7 +163,7 @@ public class SimpleJsonWriter {
 				var next = iterator.next();
 				writer.write(',');
 				writer.write('\n');
-				quote(next, writer, 1);
+				quote(next, writer, 1); // TODO Hard-coded level?
 				writer.write(": ");
 				SimpleJsonWriter.asNestedArray(elements.get(next), writer, level + 2);
 			}
