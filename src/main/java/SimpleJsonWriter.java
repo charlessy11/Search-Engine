@@ -119,7 +119,7 @@ public class SimpleJsonWriter {
 				SimpleJsonWriter.writeNestedArray(next, writer, level);
 			}
 			writer.write('\n');
-			indent("}", writer, 1);
+			indent("}", writer, level - 1);
 		}
 		else {
 			writer.write('}');
@@ -134,7 +134,8 @@ public class SimpleJsonWriter {
 	 * @param level the level to use
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void writeNestedArray(Entry<String, ? extends Collection<Integer>> entry, Writer writer, int level) throws IOException {
+	public static void writeNestedArray(Entry<String, ? extends Collection<Integer>> entry, 
+			Writer writer, int level) throws IOException {
 		quote(entry.getKey(), writer, level);
 		writer.write(": ");
 		SimpleJsonWriter.asArray(entry.getValue(), writer, level);
@@ -163,7 +164,7 @@ public class SimpleJsonWriter {
 				var next = iterator.next();
 				writer.write(',');
 				writer.write('\n');
-				quote(next, writer, 1); // TODO Hard-coded level?
+				quote(next, writer, level + 1);
 				writer.write(": ");
 				SimpleJsonWriter.asNestedArray(elements.get(next), writer, level + 2);
 			}
@@ -240,7 +241,8 @@ public class SimpleJsonWriter {
 	 * @param path the file path to use
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void asNested(Map<String, TreeMap<String, Set<Integer>>> elements, Path path) throws IOException {
+	public static void asNested(Map<String, TreeMap<String, 
+			Set<Integer>>> elements, Path path) throws IOException {
 		try (
 				BufferedWriter writer = Files.newBufferedWriter(path,
 						StandardCharsets.UTF_8)
