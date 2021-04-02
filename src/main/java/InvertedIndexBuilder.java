@@ -62,6 +62,7 @@ public class InvertedIndexBuilder {
 			int position = 1; //position start at index 1
 			Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
 			String line = null;
+			// TODO String location = path.toString() <--- and reuse below to avoid calling path.toString over and over again
 			while ((line = read.readLine()) != null) {
 				for (String word : TextParser.parse(line)) {
 					//add to inverted index
