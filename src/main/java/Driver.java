@@ -43,7 +43,7 @@ public class Driver {
 		if (map.hasFlag("-index")) {
 			try {
 				//use given path (or index.json as the default output path) to print inverted index as JSON
-				invertedIndex.toJson(map.getPath("-index", Path.of("index.json")));
+				invertedIndex.toJsonInvertedIndex(map.getPath("-index", Path.of("index.json")));
 			} catch (IOException e) {
 				if (map.hasValue("-index")) {
 					System.out.println("Error: Unable to write the inverted index to file: " + map.getPath("-index").toString());
@@ -53,6 +53,41 @@ public class Driver {
 				}
 			}
 		}
+		
+		//optional flag to output all of the locations and their word count
+		if (map.hasFlag("-counts")) {
+			try {
+				//use given path (or counts.json as the default output path) to print pretty JSON
+				invertedIndex.toJsonObject(map.getPath("-counts", Path.of("counts.json")));
+			} catch (IOException e) {
+				System.out.println("Error: Unable to calculate total amount of stemmed words.");
+				}
+			}
+				
+			//indicates that a search should be performed
+			if (map.hasFlag("-query") && map.hasValue("-query")) {
+				try {
+					//optional flag that indicates all search operations performed should be exact search
+					if (map.hasFlag("-exact")) {
+						builder.parseQuery(map.getPath("-query"), true);
+					}
+					//partial search
+					else {
+						builder.parseQuery(map.getPath("-query"), false);
+					}
+				} catch (IOException e) {
+					System.out.println("Error: No search performed.");
+				}
+			}
+				
+			//optional flag that indicates the next argument is the path to use for the search results output file
+			if (map.hasFlag("-results")) {
+				try {
+					builder.toJsonNestedResult(map.getPath("-results", Path.of("results.json")));
+				} catch (IOException e) {
+					System.out.println("Warning: No output file produced of search results but still performed the search operation..");
+				}
+			}
 		
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());

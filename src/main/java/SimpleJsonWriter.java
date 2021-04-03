@@ -5,6 +5,7 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.DecimalFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Map;
@@ -173,6 +174,151 @@ public class SimpleJsonWriter {
 		}
 		else {
 			writer.write('}');
+		}
+	}
+	
+	/**
+	 * Outputs the key results (location, total matches, and score) as as an array of nested JSON objects
+	 * 
+	 * @param elements the elements to write
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
+	 */
+	public static void asResult(Collection<SingleSearchResult> elements, Writer writer, int level) throws IOException {		
+		if (!elements.isEmpty()) {
+			Iterator<SingleSearchResult> iterator = elements.iterator();
+			SingleSearchResult first = iterator.next();
+			SimpleJsonWriter.writeResult(first, writer, level);
+			while (iterator.hasNext()) {
+				writer.write(',');
+				writer.write('\n');
+				SingleSearchResult next = iterator.next();
+				SimpleJsonWriter.writeResult(next, writer, level);
+			}
+		}
+	}
+	
+	/**
+	 * Writes the entry for asResult function
+	 * 
+	 * @param entry the entry to write
+	 * @param writer the writer to use
+	 * @param level the level to use
+	 */
+	public static void writeResult(SingleSearchResult entry, Writer writer, int level) {
+		try {
+			DecimalFormat FORMATTER = new DecimalFormat("0.00000000");
+			indent("{", writer, level + 1);
+			writer.write('\n');
+			quote("where", writer, level + 2);
+			writer.write(": ");
+			quote(entry.getLocation(), writer, level - 1);
+			writer.write(',');
+			writer.write('\n');
+			quote("count", writer, level + 2);
+			writer.write(": ");
+			writer.write(Integer.toString(entry.getMatches()));
+			writer.write(',');
+			writer.write('\n');
+			quote("score", writer, level + 2);
+			writer.write(": ");
+			writer.write(FORMATTER.format(entry.getScore()));
+			writer.write('\n');
+			indent("}", writer, level + 1);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Outputs the search results including the key queries as a JSON array of JSON objects
+	 * 
+	 * @param elements the elements to write
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
+	 */
+	public static void asNestedResult(Map<String, ? extends Collection<SingleSearchResult>> elements, Writer writer,
+			int level) throws IOException {
+		writer.write("{");
+		writer.write('\n');
+		if (!elements.isEmpty()) {
+			var iterator = elements.entrySet().iterator();		
+			var entry1 = iterator.next();
+			SimpleJsonWriter.writeNestedResult(entry1, writer, level);
+			while (iterator.hasNext()) {
+				var entry2 = iterator.next();
+				writer.write(',');
+				writer.write('\n');
+				SimpleJsonWriter.writeNestedResult(entry2, writer, level);
+			}	
+			writer.write('\n');
+			writer.write('}');
+		}
+	}
+	
+	/**
+	 * Writes the entry for asNestedResult function
+	 * 
+	 * @param entry the entry to write
+	 * @param writer the writer to use
+	 * @param level the level to use
+	 */
+	public static void writeNestedResult(
+			Entry<String, ? extends Collection<SingleSearchResult>> entry, Writer writer, int level) {
+		try {
+			quote(entry.getKey(), writer, level + 1);
+			writer.write(": ");
+			writer.write("[");
+			if (!entry.getValue().isEmpty()) {
+				writer.write('\n');
+				SimpleJsonWriter.asResult(entry.getValue(), writer, level + 1);
+			}
+			writer.write('\n');
+			indent("]", writer, level + 1);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Writes the elements as a pretty JSON nested result to file.
+	 *
+	 * @param elements the elements to write
+	 * @param path the file path to use
+	 * @throws IOException if an IO error occurs
+	 *
+	 * @see #asArray(Collection, Writer, int)
+	 */
+	public static void asNestedResult(
+			Map<String, ? extends Collection<SingleSearchResult>> elements, Path path) 
+			throws IOException {
+		try (
+				BufferedWriter writer = Files.newBufferedWriter(path,
+						StandardCharsets.UTF_8)
+		) {
+			asNestedResult(elements, writer, 0);
+		}
+	}
+	
+	/**
+	 * Returns the elements as a nested pretty JSON nested result.
+	 *
+	 * @param elements the elements to use
+	 * @return a {@link String} containing the elements in pretty JSON format
+	 *
+	 * @see #asNestedArray(Map, Writer, int)
+	 */
+	public static String asNestedResult(
+			Map<String, ? extends Collection<SingleSearchResult>> elements) {
+		try {
+			StringWriter writer = new StringWriter();
+			asNestedResult(elements, writer, 0);
+			return writer.toString();
+		}
+		catch (IOException e) {
+			return null;
 		}
 	}
 	

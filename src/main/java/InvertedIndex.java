@@ -1,9 +1,13 @@
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 import java.util.Set;
 
 /**
@@ -20,10 +24,16 @@ public class InvertedIndex {
 	private final TreeMap<String, TreeMap<String, Set<Integer>>> map;
 	
 	/**
+	 * Stores word count
+	 */
+	private final TreeMap<String, Integer> wordCount;
+	
+	/**
 	 * Constructor defines map
 	 */
 	public InvertedIndex() {
 		this.map = new TreeMap<String, TreeMap<String, Set<Integer>>>(); 
+		this.wordCount =  new TreeMap<>();
 	}
 	
 	/**
@@ -37,6 +47,7 @@ public class InvertedIndex {
 		map.putIfAbsent(word, new TreeMap<>());
 		map.get(word).putIfAbsent(location, new TreeSet<>());
 		map.get(word).get(location).add(position);
+		wordCount.put(location, position);
 	}
 	
 	/**
@@ -167,21 +178,77 @@ public class InvertedIndex {
 	 * @param path the path given by user or default path if otherwise
 	 * @throws IOException if an IO error occurs
 	 */
-	public void toJson(Path path) throws IOException {
+	public void toJsonInvertedIndex(Path path) throws IOException {
 		SimpleJsonWriter.asNested(map, path);
 	}
 	
+	
 	/**
-	 * Convenience method to add all words, location, and position to the inverted index
+	 * Performs exact search
 	 * 
-	 * @param words the list of words
-	 * @param path the path of the list
+	 * @param line the parsed words from a single line of the query file
+	 * @return sorted list of search results
 	 */
-	public void addAll(Collection<String> words, Path path) {
-		int position = 1;
-		for (String word : words) {
-			add(word, path.toString(), position);
-			position++;
+	public List<SingleSearchResult> exactSearch(TreeSet<String> line) {
+		Map<String, SingleSearchResult> temp = new TreeMap<>();
+		List<SingleSearchResult> listExact = new ArrayList<>();
+		for (String word : line) {
+			//check if word is stored in inverted index
+			if (contains(word)) {
+				for (String path : get(word)) {
+					if (!temp.containsKey(path)) {
+						temp.put(path, 
+								new SingleSearchResult(path, wordCount.get(path), get(word, path).size()));
+					}
+					else {
+						temp.get(path).setMatches(get(word, path).size());
+					}
+				}
+			}
 		}
+		listExact = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
+		Collections.sort(listExact);
+		return listExact;
+	}
+	
+	/**
+	 * Performs partial search
+	 * 
+	 * @param line the parsed words from a single line of the query file
+	 * @return sorted list of search results
+	 */
+	public List<SingleSearchResult> partialSearch(TreeSet<String> line) {
+		Map<String, SingleSearchResult> temp = new TreeMap<>();
+		List<SingleSearchResult> listPartial = new ArrayList<>();
+		for (String word : line) {
+			var iterator = map.entrySet().iterator();
+			while (iterator.hasNext()) {
+				var entry = iterator.next();
+				if (entry.getKey().startsWith(word)) {
+					for (String path : get(entry.getKey())) {
+						if (!temp.containsKey(path)) {
+							temp.put(path, new SingleSearchResult(path, 
+									wordCount.get(path), get(entry.getKey(), path).size()));
+						} 
+						else {
+							temp.get(path).setMatches(get(entry.getKey(), path).size());
+						}
+					}
+				}
+			}
+		}
+		listPartial = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
+		Collections.sort(listPartial);
+		return listPartial;
+	}
+	
+	/**
+	 * Calls SimpleJsonWriter's asObject method
+	 * 
+	 * @param path the path given by user or default path if otherwise
+	 * @throws IOException if an IO error occurs
+	 */
+	public void toJsonObject(Path path) throws IOException {
+		SimpleJsonWriter.asObject(wordCount, path);
 	}
 }
