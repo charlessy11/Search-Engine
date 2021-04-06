@@ -77,6 +77,8 @@ public class InvertedIndexBuilder {
 		}
 	}
 	
+	// TODO QueryResultBuilder with results parseQuery toJsonNestedResult
+	
 	/**
 	 * Stores single search results
 	 */
@@ -90,7 +92,7 @@ public class InvertedIndexBuilder {
 	 * @throws IOException if an IO error occurs
 	 */
 	public void parseQuery(Path path, boolean exact) throws IOException {
-		results.clear();
+		results.clear(); // TODO Remove
 		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
 			String line;
 			while ((line = read.readLine()) != null) {
