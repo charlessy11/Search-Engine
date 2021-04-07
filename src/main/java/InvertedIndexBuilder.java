@@ -15,7 +15,7 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM;
 /**
  * Builds Inverted Index
  * 
- * @author jett
+ * @author Charles Sy
  *
  */
 public class InvertedIndexBuilder {
@@ -92,7 +92,6 @@ public class InvertedIndexBuilder {
 	 * @throws IOException if an IO error occurs
 	 */
 	public void parseQuery(Path path, boolean exact) throws IOException {
-		results.clear(); // TODO Remove
 		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
 			String line;
 			while ((line = read.readLine()) != null) {

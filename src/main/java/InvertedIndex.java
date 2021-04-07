@@ -57,7 +57,10 @@ public class InvertedIndex {
 		 * map.merge <---- lambda expressions
 		 * or just Math.max or an if condition
 		 */
-		wordCount.put(location, position);
+//		if (wordCount.get(location) < position) {
+//		int count = Math.max(wordCount.get(location), position);
+			wordCount.put(location, position);
+//		}
 	}
 	
 	/**
@@ -192,18 +195,17 @@ public class InvertedIndex {
 		SimpleJsonWriter.asNested(map, path);
 	}
 	
-	// TODO Set<String> queries (instead of line)
 	/**
 	 * Performs exact search
 	 * 
-	 * @param line the parsed words from a single line of the query file
+	 * @param queries the parsed words from a single line of the query file
 	 * @return sorted list of search results
 	 */
-	public List<SingleSearchResult> exactSearch(TreeSet<String> line) {
+	public List<SingleSearchResult> exactSearch(Set<String> queries) {
 		// TODO Why are there 2 data structures here
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> listExact = new ArrayList<>();
-		for (String word : line) {
+		for (String word : queries) {
 			//check if word is stored in inverted index
 			if (contains(word)) {
 				for (String path : get(word)) {
@@ -239,13 +241,13 @@ public class InvertedIndex {
 	/**
 	 * Performs partial search
 	 * 
-	 * @param line the parsed words from a single line of the query file
+	 * @param queries the parsed words from a single line of the query file
 	 * @return sorted list of search results
 	 */
-	public List<SingleSearchResult> partialSearch(TreeSet<String> line) {
+	public List<SingleSearchResult> partialSearch(Set<String> queries) {
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> listPartial = new ArrayList<>();
-		for (String word : line) {
+		for (String word : queries) {
 			var iterator = map.entrySet().iterator();
 			while (iterator.hasNext()) {
 				var entry = iterator.next();
