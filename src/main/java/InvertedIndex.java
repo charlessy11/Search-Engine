@@ -251,4 +251,18 @@ public class InvertedIndex {
 	public void toJsonObject(Path path) throws IOException {
 		SimpleJsonWriter.asObject(wordCount, path);
 	}
+	
+	/**
+	 * Convenience method to add all words, location, and position to the inverted index
+	 * 
+	 * @param words the list of words
+	 * @param path the path of the list
+	 */
+	public void addAll(Collection<String> words, Path path) {
+		int position = 1;
+		for (String word : words) {
+			add(word, path.toString(), position);
+			position++;
+		}
+	}
 }
