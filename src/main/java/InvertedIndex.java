@@ -32,7 +32,7 @@ public class InvertedIndex {
 	 * Constructor defines map
 	 */
 	public InvertedIndex() {
-		this.map = new TreeMap<String, TreeMap<String, Set<Integer>>>(); 
+		this.map = new TreeMap<String, TreeMap<String, Set<Integer>>>();
 		this.wordCount =  new TreeMap<>();
 	}
 	
@@ -47,6 +47,16 @@ public class InvertedIndex {
 		map.putIfAbsent(word, new TreeMap<>());
 		map.get(word).putIfAbsent(location, new TreeSet<>());
 		map.get(word).get(location).add(position);
+		
+		/*
+		 * TODO 
+		 * add(hello, hello.txt, 19); <--- word count = 19
+		 * add(hello, hell0.txt, 2);  <---- now 2? 
+		 * 
+		 * Only update if the current value in the wordCount map is less than the new one
+		 * map.merge <---- lambda expressions
+		 * or just Math.max or an if condition
+		 */
 		wordCount.put(location, position);
 	}
 	
@@ -182,7 +192,7 @@ public class InvertedIndex {
 		SimpleJsonWriter.asNested(map, path);
 	}
 	
-	
+	// TODO Set<String> queries (instead of line)
 	/**
 	 * Performs exact search
 	 * 
@@ -190,6 +200,7 @@ public class InvertedIndex {
 	 * @return sorted list of search results
 	 */
 	public List<SingleSearchResult> exactSearch(TreeSet<String> line) {
+		// TODO Why are there 2 data structures here
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> listExact = new ArrayList<>();
 		for (String word : line) {
@@ -210,6 +221,20 @@ public class InvertedIndex {
 		Collections.sort(listExact);
 		return listExact;
 	}
+	
+	/*
+	 * TODO This is doing a linear search for a consecutive chunk of elements. We fix
+	 * these types of linear searches differently. Here, the key observation to make
+	 * is that our data is sorted. Anytime we have sorted data, we can do something
+	 * like a binary search to speed things up. In this case, we don't need to explicitly
+	 * do a binary search---this kind of functionality is built into tree data structures.
+	 * Look at this lecture example:
+	 *
+	 * https://github.com/usf-cs212-spring2021/lectures/blob/8c166c28ad8756c0aa1ccfb3e0b237e83e8c9358/ DataStructures/src/main/java/FindDemo.java#L119-L170
+	 *
+	 * You can take a similar approach using TreeMaps too! If you aren't sure how to
+	 * adapt this for partial search, reach out on Piazza!
+	 */
 	
 	/**
 	 * Performs partial search
