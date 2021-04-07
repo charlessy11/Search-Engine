@@ -26,6 +26,7 @@ public class Driver {
 		ArgumentMap map = new ArgumentMap(args); //parses command-line arguments
 		InvertedIndex invertedIndex = new InvertedIndex();
 		InvertedIndexBuilder builder = new InvertedIndexBuilder(invertedIndex);
+		QueryResultBuilder resultBuilder = new QueryResultBuilder(invertedIndex);
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
@@ -69,11 +70,11 @@ public class Driver {
 				try {
 					//optional flag that indicates all search operations performed should be exact search
 					if (map.hasFlag("-exact")) {
-						builder.parseQuery(map.getPath("-query"), true);
+						resultBuilder.parseQuery(map.getPath("-query"), true);
 					}
 					//partial search
 					else {
-						builder.parseQuery(map.getPath("-query"), false);
+						resultBuilder.parseQuery(map.getPath("-query"), false);
 					}
 				} catch (IOException e) {
 					System.out.println("Error: No search performed.");
@@ -83,7 +84,7 @@ public class Driver {
 			//optional flag that indicates the next argument is the path to use for the search results output file
 			if (map.hasFlag("-results")) {
 				try {
-					builder.toJsonNestedResult(map.getPath("-results", Path.of("results.json")));
+					resultBuilder.toJsonNestedResult(map.getPath("-results", Path.of("results.json")));
 				} catch (IOException e) {
 					System.out.println("Warning: No output file produced of search results but still performed the search operation..");
 				}
