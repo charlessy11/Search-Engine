@@ -25,13 +25,13 @@ public class Driver {
 
 		ArgumentMap map = new ArgumentMap(args); //parses command-line arguments
 		InvertedIndex invertedIndex = new InvertedIndex();
-		InvertedIndexBuilder builder = new InvertedIndexBuilder(invertedIndex);
+		InvertedIndexBuilder indexBuilder = new InvertedIndexBuilder(invertedIndex);
 		QueryResultBuilder resultBuilder = new QueryResultBuilder(invertedIndex);
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
 			try {
-				builder.add(map.getPath("-text"));
+				indexBuilder.add(map.getPath("-text"));
 			} catch (IOException e) {
 				System.out.println("Error: Unable to add data to the inverted index.");
 			}
@@ -65,30 +65,30 @@ public class Driver {
 				}
 			}
 				
-			//indicates that a search should be performed
-			if (map.hasFlag("-query") && map.hasValue("-query")) {
-				try {
-					//optional flag that indicates all search operations performed should be exact search
-					if (map.hasFlag("-exact")) {
-						resultBuilder.parseQuery(map.getPath("-query"), true);
-					}
-					//partial search
-					else {
-						resultBuilder.parseQuery(map.getPath("-query"), false);
-					}
-				} catch (IOException e) {
-					System.out.println("Error: No search performed.");
+		//indicates that a search should be performed
+		if (map.hasFlag("-query") && map.hasValue("-query")) {
+			try {
+				//optional flag that indicates all search operations performed should be exact search
+				if (map.hasFlag("-exact")) {
+					resultBuilder.parseQuery(map.getPath("-query"), true);
 				}
+				//partial search
+				else {
+					resultBuilder.parseQuery(map.getPath("-query"), false);
+				}
+			} catch (IOException e) {
+				System.out.println("Error: No search performed.");
 			}
+		}
 				
-			//optional flag that indicates the next argument is the path to use for the search results output file
-			if (map.hasFlag("-results")) {
-				try {
-					resultBuilder.toJsonNestedResult(map.getPath("-results", Path.of("results.json")));
-				} catch (IOException e) {
-					System.out.println("Warning: No output file produced of search results but still performed the search operation..");
-				}
+		//optional flag that indicates the next argument is the path to use for the search results output file
+		if (map.hasFlag("-results")) {
+			try {
+				resultBuilder.toJsonNestedResult(map.getPath("-results", Path.of("results.json")));
+			} catch (IOException e) {
+				System.out.println("Warning: No output file produced of search results but still performed the search operation..");
 			}
+		}
 		
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());
