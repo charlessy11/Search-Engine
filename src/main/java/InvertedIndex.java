@@ -202,18 +202,23 @@ public class InvertedIndex {
 	 * @return sorted list of search results
 	 */
 	public List<SingleSearchResult> exactSearch(Set<String> queries) {
-		// TODO Why are there 2 data structures here
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> listExact = new ArrayList<>();
+		//for each parsed word from set
 		for (String word : queries) {
 			//check if word is stored in inverted index
 			if (contains(word)) {
+				//for each location stored in the inverted index
 				for (String path : get(word)) {
+					//check if map doesn't contain the location
 					if (!temp.containsKey(path)) {
+						//add data to map
 						temp.put(path, 
 								new SingleSearchResult(path, wordCount.get(path), get(word, path).size()));
 					}
+					//if map contains the location
 					else {
+						//perform a match
 						temp.get(path).setMatches(get(word, path).size());
 					}
 				}
@@ -244,26 +249,31 @@ public class InvertedIndex {
 	 * @param queries the parsed words from a single line of the query file
 	 * @return sorted list of search results
 	 */
-	public List<SingleSearchResult> partialSearch(Set<String> queries) {
+	public List<SingleSearchResult> partialSearch(TreeSet<String> queries) {
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> listPartial = new ArrayList<>();
-		for (String word : queries) {
-			var iterator = map.entrySet().iterator();
-			while (iterator.hasNext()) {
-				var entry = iterator.next();
-				if (entry.getKey().startsWith(word)) {
-					for (String path : get(entry.getKey())) {
-						if (!temp.containsKey(path)) {
-							temp.put(path, new SingleSearchResult(path, 
-									wordCount.get(path), get(entry.getKey(), path).size()));
-						} 
-						else {
-							temp.get(path).setMatches(get(entry.getKey(), path).size());
+		for (String query : queries) { 
+			for (String word : map.tailMap(query).keySet()) {
+				var iterator = map.entrySet().iterator();
+				while (iterator.hasNext()) {
+					var entry = iterator.next();
+					if (entry.getKey().startsWith(word)) {
+						for (String path : get(entry.getKey())) {
+							if (!temp.containsKey(path)) {
+								temp.put(path, new SingleSearchResult(path, 
+										wordCount.get(path), get(entry.getKey(), path).size()));
+							} 
+							else {
+								temp.get(path).setMatches(get(entry.getKey(), path).size());
+							}
 						}
+					}
+					else {
+						break;
 					}
 				}
 			}
-		}
+		}	
 		listPartial = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
 		Collections.sort(listPartial);
 		return listPartial;
