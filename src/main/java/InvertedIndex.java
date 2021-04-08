@@ -252,8 +252,9 @@ public class InvertedIndex {
 	public List<SingleSearchResult> partialSearch(TreeSet<String> queries) {
 		Map<String, SingleSearchResult> temp = new TreeMap<>();
 		List<SingleSearchResult> listPartial = new ArrayList<>();
-		for (String query : queries) { 
-			for (String word : map.tailMap(query).keySet()) {
+//		for (String query : queries) { 
+//			for (String word : map.tailMap(query).keySet()) {
+			for (String word : queries) {
 				var iterator = map.entrySet().iterator();
 				while (iterator.hasNext()) {
 					var entry = iterator.next();
@@ -268,12 +269,12 @@ public class InvertedIndex {
 							}
 						}
 					}
-					else {
-						break;
-					}
+//					else {
+//						break;
+//					}
 				}
 			}
-		}	
+//		}	
 		listPartial = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
 		Collections.sort(listPartial);
 		return listPartial;
