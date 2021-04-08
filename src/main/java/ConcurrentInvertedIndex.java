@@ -1,7 +1,6 @@
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * A thread-safe version of IndvertedIndex using a custom read/write lock.
@@ -10,15 +9,15 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *
  */
 public class ConcurrentInvertedIndex extends InvertedIndex {
-	/** The lock object to use. */
-	private ReentrantReadWriteLock lock;
+	/** The lock used to protect concurrent access to the underlying inverted index. */
+	private final SimpleReadWriteLock lock;
 	
 	/**
 	 * Constructor calls super class's constructor and initializes lock
 	 */
 	public ConcurrentInvertedIndex() {
 		super();
-		lock = new ReentrantReadWriteLock();
+		lock = new SimpleReadWriteLock();
 	}
 	
 	@Override
