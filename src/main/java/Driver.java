@@ -64,30 +64,35 @@ public class Driver {
 				}
 			}
 				
-			//indicates that a search should be performed
-			if (map.hasFlag("-query") && map.hasValue("-query")) {
-				try {
-					//optional flag that indicates all search operations performed should be exact search
-					if (map.hasFlag("-exact")) {
-						builder.parseQuery(map.getPath("-query"), true);
-					}
-					//partial search
-					else {
-						builder.parseQuery(map.getPath("-query"), false);
-					}
-				} catch (IOException e) {
-					System.out.println("Error: No search performed.");
+		//indicates that a search should be performed
+		if (map.hasFlag("-query") && map.hasValue("-query")) {
+			try {
+				//optional flag that indicates all search operations performed should be exact search
+				if (map.hasFlag("-exact")) {
+					builder.parseQuery(map.getPath("-query"), true);
 				}
+				//partial search
+				else {
+					builder.parseQuery(map.getPath("-query"), false);
+				}
+			} catch (IOException e) {
+				System.out.println("Error: No search performed.");
 			}
+		}
 				
-			//optional flag that indicates the next argument is the path to use for the search results output file
-			if (map.hasFlag("-results")) {
-				try {
-					builder.toJsonNestedResult(map.getPath("-results", Path.of("results.json")));
-				} catch (IOException e) {
-					System.out.println("Warning: No output file produced of search results but still performed the search operation..");
-				}
+		//optional flag that indicates the next argument is the path to use for the search results output file
+		if (map.hasFlag("-results")) {
+			try {
+				builder.toJsonNestedResult(map.getPath("-results", Path.of("results.json")));
+			} catch (IOException e) {
+				System.out.println("Warning: No output file produced of search results but still performed the search operation..");
 			}
+		}
+		
+		//perform multithreading
+		if (map.hasFlag("-threads")) {
+			
+		}
 		
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());
