@@ -3,11 +3,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import java.util.Set;
 
 /**
@@ -46,21 +46,9 @@ public class InvertedIndex {
 	public void add(String word, String location, Integer position) {
 		map.putIfAbsent(word, new TreeMap<>());
 		map.get(word).putIfAbsent(location, new TreeSet<>());
-		map.get(word).get(location).add(position);
-		
-		/*
-		 * TODO 
-		 * add(hello, hello.txt, 19); <--- word count = 19
-		 * add(hello, hell0.txt, 2);  <---- now 2? 
-		 * 
-		 * Only update if the current value in the wordCount map is less than the new one
-		 * map.merge <---- lambda expressions
-		 * or just Math.max or an if condition
-		 */
-//		if (wordCount.get(location) < position) {
-//		int count = Math.max(wordCount.get(location), position);
-			wordCount.put(location, position);
-//		}
+		if (map.get(word).get(location).add(position)) {
+			wordCount.put(location, position); //only update if current value is less than the new one
+		}
 	}
 	
 	/**
@@ -202,46 +190,34 @@ public class InvertedIndex {
 	 * @return sorted list of search results
 	 */
 	public List<SingleSearchResult> exactSearch(Set<String> queries) {
-		Map<String, SingleSearchResult> temp = new TreeMap<>();
+		/* Keeps track of values added. Necessary to easily lookup values that we've already processed, thus 
+		 * eliminating duplicate paths and search results. Searching is faster w/ maps rather than lists. */
+		Map<String, SingleSearchResult> check = new HashMap<>(); 
 		List<SingleSearchResult> listExact = new ArrayList<>();
 		//for each parsed word from set
 		for (String word : queries) {
-			//check if word is stored in inverted index
 			if (contains(word)) {
 				//for each location stored in the inverted index
 				for (String path : get(word)) {
 					//check if map doesn't contain the location
-					if (!temp.containsKey(path)) {
-						//add data to map
-						temp.put(path, 
-								new SingleSearchResult(path, wordCount.get(path), get(word, path).size()));
+					if (!check.containsKey(path)) {
+						SingleSearchResult result = new SingleSearchResult
+								(path, wordCount.get(path), get(word, path).size());
+						check.put(path, result);
+						listExact.add(result);
+						
 					}
 					//if map contains the location
 					else {
 						//perform a match
-						temp.get(path).setMatches(get(word, path).size());
+						check.get(path).setMatches(get(word, path).size());
 					}
 				}
 			}
 		}
-		listExact = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
 		Collections.sort(listExact);
 		return listExact;
 	}
-	
-	/*
-	 * TODO This is doing a linear search for a consecutive chunk of elements. We fix
-	 * these types of linear searches differently. Here, the key observation to make
-	 * is that our data is sorted. Anytime we have sorted data, we can do something
-	 * like a binary search to speed things up. In this case, we don't need to explicitly
-	 * do a binary search---this kind of functionality is built into tree data structures.
-	 * Look at this lecture example:
-	 *
-	 * https://github.com/usf-cs212-spring2021/lectures/blob/8c166c28ad8756c0aa1ccfb3e0b237e83e8c9358/ DataStructures/src/main/java/FindDemo.java#L119-L170
-	 *
-	 * You can take a similar approach using TreeMaps too! If you aren't sure how to
-	 * adapt this for partial search, reach out on Piazza!
-	 */
 	
 	/**
 	 * Performs partial search
@@ -249,33 +225,27 @@ public class InvertedIndex {
 	 * @param queries the parsed words from a single line of the query file
 	 * @return sorted list of search results
 	 */
-	public List<SingleSearchResult> partialSearch(TreeSet<String> queries) {
-		Map<String, SingleSearchResult> temp = new TreeMap<>();
+	public List<SingleSearchResult> partialSearch(Set<String> queries) {
+		Map<String, SingleSearchResult> temp = new HashMap<>();
 		List<SingleSearchResult> listPartial = new ArrayList<>();
-//		for (String query : queries) { 
-//			for (String word : map.tailMap(query).keySet()) {
-			for (String word : queries) {
-				var iterator = map.entrySet().iterator();
-				while (iterator.hasNext()) {
-					var entry = iterator.next();
-					if (entry.getKey().startsWith(word)) {
-						for (String path : get(entry.getKey())) {
-							if (!temp.containsKey(path)) {
-								temp.put(path, new SingleSearchResult(path, 
-										wordCount.get(path), get(entry.getKey(), path).size()));
-							} 
-							else {
-								temp.get(path).setMatches(get(entry.getKey(), path).size());
-							}
-						}
+		for (String query : queries) { 
+			for (String word : map.tailMap(query).keySet()) {
+				if (!word.startsWith(query)) {
+					break;
+				} 
+				for (String path : get(word)) {
+					if (!temp.containsKey(path)) {
+						SingleSearchResult result = new SingleSearchResult(path, 
+								wordCount.get(path), get(word, path).size());
+						temp.put(path, result);
+						listPartial.add(result);
+					} 
+					else {
+						temp.get(path).setMatches(get(word, path).size());
 					}
-//					else {
-//						break;
-//					}
 				}
 			}
-//		}	
-		listPartial = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
+		}
 		Collections.sort(listPartial);
 		return listPartial;
 	}
