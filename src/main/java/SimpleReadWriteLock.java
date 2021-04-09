@@ -1,8 +1,4 @@
 import java.util.ConcurrentModificationException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * Maintains a pair of associated locks, one for read-only operations and one
@@ -13,11 +9,6 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * <!-- simplified lock used for this class -->
  * @see SimpleLock 
  * 
- * <!-- built-in Java locks that are similar (but more complex) -->
- * @see Lock
- * @see ReentrantLock
- * @see ReadWriteLock
- * @see ReentrantReadWriteLock
  *
  * @author CS 212 Software Development
  * @author University of San Francisco
