@@ -181,6 +181,17 @@ public class ArgumentMap {
 		}
 		return defaultValue;
 	}
+	
+	/**
+	 * Returns the value the specified flag is mapped as an int value.
+	 *
+	 * @param flag the flag whose associated value will be returned
+	 * @return the value the specified flag is mapped as a int, or the default
+	 *         value if there is no valid mapping
+	 */
+	public int getInteger(String flag) {
+			return Integer.parseInt(map.get(flag));
+	}
 
 	/**
 	 * Returns the value the specified flag is mapped as an int value, or the
