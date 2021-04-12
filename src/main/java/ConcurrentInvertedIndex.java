@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.TreeSet;
@@ -170,6 +172,30 @@ public class ConcurrentInvertedIndex extends InvertedIndex {
 
 		try {
 			return super.partialSearch(line);
+		}
+		finally {
+			lock.readLock().unlock();
+		}
+	}
+	
+	@Override
+	public void toJsonInvertedIndex(Path path) throws IOException {
+		lock.readLock().lock();
+		
+		try {
+			super.toJsonInvertedIndex(path);
+		}
+		finally {
+			lock.readLock().unlock();
+		}
+	}
+	
+	@Override
+	public void toJsonObject(Path path) throws IOException {
+		lock.readLock().lock();
+		
+		try {
+			super.toJsonObject(path);
 		}
 		finally {
 			lock.readLock().unlock();
