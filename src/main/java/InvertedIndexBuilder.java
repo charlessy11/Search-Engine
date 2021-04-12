@@ -11,7 +11,7 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM;
 /**
  * Builds Inverted Index
  * 
- * @author jett
+ * @author Charles Sy
  *
  */
 public class InvertedIndexBuilder {
@@ -83,6 +83,4 @@ public class InvertedIndexBuilder {
 			}
 		}
 	}
-	
-	
 }
