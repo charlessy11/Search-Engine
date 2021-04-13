@@ -47,6 +47,7 @@ public class InvertedIndex {
 		map.putIfAbsent(word, new TreeMap<>());
 		map.get(word).putIfAbsent(location, new TreeSet<>());
 		if (map.get(word).get(location).add(position)) {
+			// TODO wordCount.merge(location, position, Integer::max);
 			wordCount.put(location, position); //only update if current value is less than the new one
 		}
 	}
@@ -183,6 +184,12 @@ public class InvertedIndex {
 		SimpleJsonWriter.asNested(map, path);
 	}
 	
+	/* TODO 
+	public List<SingleSearchResult> search(Set<String> queries, boolean exact) {
+		return exact ? exactSearch(queries) : partialSearch(queries);
+	}
+	*/
+	
 	/**
 	 * Performs exact search
 	 * 
@@ -198,7 +205,7 @@ public class InvertedIndex {
 		for (String word : queries) {
 			if (contains(word)) {
 				//for each location stored in the inverted index
-				for (String path : get(word)) {
+				for (String path : get(word)) { // TODO Access data directly now
 					//check if map doesn't contain the location
 					if (!check.containsKey(path)) {
 						SingleSearchResult result = new SingleSearchResult
@@ -212,6 +219,16 @@ public class InvertedIndex {
 						//perform a match
 						check.get(path).setMatches(get(word, path).size());
 					}
+					
+					/* TODO 
+					if (!check.containsKey(path)) {
+						SingleSearchResult result = new SingleSearchResult(path);
+						check.put(path, result);
+						listExact.add(result);
+					}
+					
+					check.get(path).update(word);
+					*/
 				}
 			}
 		}
@@ -233,6 +250,7 @@ public class InvertedIndex {
 				if (!word.startsWith(query)) {
 					break;
 				} 
+				// TODO Move the duplicate code into a private search helper
 				for (String path : get(word)) {
 					if (!temp.containsKey(path)) {
 						SingleSearchResult result = new SingleSearchResult(path, 

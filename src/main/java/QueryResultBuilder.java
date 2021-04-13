@@ -48,6 +48,7 @@ public class QueryResultBuilder {
 		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
 			String line;
 			while ((line = read.readLine()) != null) {
+				// TODO parseQuery(line, exact);
 				//assigns set a set of unique, cleaned and stemmed words parsed from line
 				TreeSet<String> set = TextFileStemmer.uniqueStems(line);
 				if (exact == true) {
@@ -64,6 +65,26 @@ public class QueryResultBuilder {
 			}
 		}
 	}
+	
+	/* TODO 
+	public void parseQuery(String line, boolean exact) {
+		TreeSet<String> set = TextFileStemmer.uniqueStems(line);
+		
+		if (!set.isEmpty()) {
+			String cleaned = String.join(" ", set);
+			
+			if (!results.containsKey(cleaned)) {
+				results.put(cleaned, invertedIndex.search(set, exact));
+			}
+		}
+	}
+	
+	hello hello world!			> hello, world
+	...
+	...
+	world HELLO world				> hello, world
+	
+	*/
 	
 	
 	/**
