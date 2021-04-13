@@ -10,6 +10,8 @@ import java.nio.file.Path;
  */
 public class ThreadSafeInvertedIndexBuilder extends InvertedIndexBuilder {
 	
+	/** The lock used to protect concurrent access to the underlying inverted index. */
+	private final SimpleReadWriteLock lock;
 	/**
 	 * The work queue
 	 */
@@ -24,21 +26,25 @@ public class ThreadSafeInvertedIndexBuilder extends InvertedIndexBuilder {
 	public ThreadSafeInvertedIndexBuilder(ConcurrentInvertedIndex invertedIndex, WorkQueue queue) {
 		super(invertedIndex);
 		this.queue = queue;
+		lock = new SimpleReadWriteLock();
 	}
 	
 	@Override
-	public synchronized void add(Path path) throws IOException {
-		super.add(path);
+	public void add(Path path) throws IOException {
+		lock.writeLock().lock();
 		try {
+			super.add(path);
 			queue.finish();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+		} finally {
+			lock.writeLock().unlock();
 		}
 		queue.shutdown();
 	}
 	
 	@Override 
-	public synchronized void addData(Path path) throws IOException {
+	public void addData(Path path) throws IOException {
 		//creates first task, gives it to the work queue, and increments pending
 		queue.execute(new Task(path));
 	}
