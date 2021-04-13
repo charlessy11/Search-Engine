@@ -44,7 +44,7 @@ public class ThreadSafeInvertedIndexBuilder extends InvertedIndexBuilder {
 	}
 	
 	/**
-	 * The non-static task class.
+	 * The non-static task class that provides functionality to threads in the runnable state.
 	 * 
 	 * @author Charles Sy
 	 *
