@@ -1,58 +1,77 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Set;
 
-import opennlp.tools.stemmer.Stemmer;
-import opennlp.tools.stemmer.snowball.SnowballStemmer;
-import opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM;
 
-//make thread safe class that "public class Task" inner class that goes through each file
-//create local index
-//localIndex.addData(file)
-//ConInvertedIndex.merge(localIndex)
-
+/**
+ * The thread safe and multithreaded inverted index builder.
+ * 
+ * @author Charles Sy
+ *
+ */
 public class ThreadSafeInvertedIndexBuilder extends InvertedIndexBuilder {
 	
-	private final ConcurrentInvertedIndex index;
+	/**
+	 * The work queue
+	 */
 	private final WorkQueue queue;
 	
-	public ThreadSafeInvertedIndexBuilder(ConcurrentInvertedIndex index, WorkQueue queue) {
-		super(index);
-		this.index = index;
+	/**
+	 * Constructor
+	 * 
+	 * @param invertedIndex the thread safe inverted index
+	 * @param queue the work queue
+	 */
+	public ThreadSafeInvertedIndexBuilder(ConcurrentInvertedIndex invertedIndex, WorkQueue queue) {
+		super(invertedIndex);
 		this.queue = queue;
 	}
 	
 	@Override
 	public synchronized void add(Path path) throws IOException {
 		super.add(path);
-//		queue.finish();
+		try {
+			queue.finish();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		queue.shutdown();
 	}
 	
 	@Override 
 	public synchronized void addData(Path path) throws IOException {
-//		super.addData(path);
-		Task task = new Task(path);
-		queue.execute(task);
+		//creates first task, gives it to the work queue, and increments pending
+		queue.execute(new Task(path));
 	}
 	
-//	WorkQueue task = new WorkQueue();
-	
+	/**
+	 * The non-static task class.
+	 * 
+	 * @author Charles Sy
+	 *
+	 */
 	private class Task implements Runnable {
+		/**
+		 * The path of the file
+		 */
 		private final Path path;
 		
+		/**
+		 * Constructor
+		 * 
+		 * @param path the path of the file
+		 */
 		public Task(Path path) {
 			this.path = path;
-//			task.incrementPending(); 
 		}
+		
 		@Override
 		public void run() {
 			InvertedIndex local = new InvertedIndex();
-			InvertedIndexBuilder.addData(path, local);
-			
+			try {
+				InvertedIndexBuilder.addData(path, local);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
-		
 	}
 }
