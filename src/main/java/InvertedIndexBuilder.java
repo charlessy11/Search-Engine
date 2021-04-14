@@ -57,6 +57,7 @@ public class InvertedIndexBuilder {
 	 * @throws IOException if an IO error occurs
 	 */
 	public void addData(Path path) throws IOException {
+		// TODO addData(path, this.invertedIndex);
 		//open file for reading
 		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {
 			int position = 1; //position start at index 1
@@ -72,4 +73,22 @@ public class InvertedIndexBuilder {
 			}
 		}
 	}
+	
+	/* TODO 
+	public static void addData(Path path, InvertedIndex invertedIndex) throws IOException {
+		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {
+			int position = 1; //position start at index 1
+			Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
+			String line = null;
+			String location = path.toString();
+			while ((line = read.readLine()) != null) {
+				for (String word : TextParser.parse(line)) {
+					//add to inverted index
+					invertedIndex.add(stemmer.stem(word).toString(), location, position);
+					position++;
+				}
+			}
+		}
+	}
+	*/
 }

@@ -63,12 +63,13 @@ public class Driver {
 			} catch (IOException e) {
 				System.out.println("Error: Unable to calculate total amount of stemmed words.");
 				}
-			}
+			} // TODO indentation
 				
 		//indicates that a search should be performed
 		if (map.hasFlag("-query") && map.hasValue("-query")) {
 			try {
 				//optional flag that indicates all search operations performed should be exact search
+				// TODO resultBuilder.parseQuery(map.getPath("-query"), map.hasFlag("-exact"));
 				if (map.hasFlag("-exact")) {
 					resultBuilder.parseQuery(map.getPath("-query"), true);
 				}

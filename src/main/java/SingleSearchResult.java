@@ -1,19 +1,21 @@
 
+// TODO Make this a public non-static inner class inside of inverted index
+
 /**
  * A class that sorts and stores a single search result
  * @author jett
  *
  */
 public class SingleSearchResult implements Comparable<SingleSearchResult> {
-
+	// TODO Make private
 	/**
 	 * The location of the text file
 	 */
-	public String location;
+	public String location; // TODO final
 	/**
 	 * The total number of word stems in each text file
 	 */
-	public int count;
+	public int count; // TODO Remove and access directly wordCount
 	/**
 	 * The total number of times any of the matching query words appear in the text file
 	 */
@@ -78,10 +80,17 @@ public class SingleSearchResult implements Comparable<SingleSearchResult> {
 	 * 
 	 * @param size the word count stored in the index
 	 */
-	public void setMatches(int size) {
+	public void setMatches(int size) { // TODO Remove
 		matches += size;
 		score = (double)matches / (double)count;
 	}
+
+	/* TODO 
+	private void update(String word) {
+		matches += map.get(word).get(where).size();
+		score = (double) matches / (double) wordCount.get(where);
+	}
+	*/
 	
 	@Override
 	public int compareTo(SingleSearchResult other) {
