@@ -47,8 +47,8 @@ public class InvertedIndex {
 		map.putIfAbsent(word, new TreeMap<>());
 		map.get(word).putIfAbsent(location, new TreeSet<>());
 		if (map.get(word).get(location).add(position)) {
-			// TODO wordCount.merge(location, position, Integer::max);
-			wordCount.put(location, position); //only update if current value is less than the new one
+			//only update if current value is less than the new one
+			wordCount.merge(location, position, Integer::max);
 		}
 	}
 	
@@ -184,11 +184,20 @@ public class InvertedIndex {
 		SimpleJsonWriter.asNested(map, path);
 	}
 	
-	/* TODO 
+	/**
+	 * Helper method that determines what type of search to perform
+	 * 
+	 * @param queries the parsed words from a single line of the query file
+	 * @param exact the flag that determines what type of search to perform
+	 * @return a sorted list of search results
+	 */
 	public List<SingleSearchResult> search(Set<String> queries, boolean exact) {
-		return exact ? exactSearch(queries) : partialSearch(queries);
+		if (exact) {
+			return exactSearch(queries);
+		} else {
+			return partialSearch(queries);
+		}
 	}
-	*/
 	
 	/**
 	 * Performs exact search
@@ -200,40 +209,15 @@ public class InvertedIndex {
 		/* Keeps track of values added. Necessary to easily lookup values that we've already processed, thus 
 		 * eliminating duplicate paths and search results. Searching is faster w/ maps rather than lists. */
 		Map<String, SingleSearchResult> check = new HashMap<>(); 
-		List<SingleSearchResult> listExact = new ArrayList<>();
+		List<SingleSearchResult> list = new ArrayList<>();
 		//for each parsed word from set
 		for (String word : queries) {
 			if (contains(word)) {
-				//for each location stored in the inverted index
-				for (String path : get(word)) { // TODO Access data directly now
-					//check if map doesn't contain the location
-					if (!check.containsKey(path)) {
-						SingleSearchResult result = new SingleSearchResult
-								(path, wordCount.get(path), get(word, path).size());
-						check.put(path, result);
-						listExact.add(result);
-						
-					}
-					//if map contains the location
-					else {
-						//perform a match
-						check.get(path).setMatches(get(word, path).size());
-					}
-					
-					/* TODO 
-					if (!check.containsKey(path)) {
-						SingleSearchResult result = new SingleSearchResult(path);
-						check.put(path, result);
-						listExact.add(result);
-					}
-					
-					check.get(path).update(word);
-					*/
-				}
+				searchHelper(check, list, word);
 			}
 		}
-		Collections.sort(listExact);
-		return listExact;
+		Collections.sort(list);
+		return list;
 	}
 	
 	/**
@@ -243,29 +227,39 @@ public class InvertedIndex {
 	 * @return sorted list of search results
 	 */
 	public List<SingleSearchResult> partialSearch(Set<String> queries) {
-		Map<String, SingleSearchResult> temp = new HashMap<>();
-		List<SingleSearchResult> listPartial = new ArrayList<>();
+		Map<String, SingleSearchResult> check = new HashMap<>();
+		List<SingleSearchResult> list = new ArrayList<>();
 		for (String query : queries) { 
 			for (String word : map.tailMap(query).keySet()) {
 				if (!word.startsWith(query)) {
 					break;
 				} 
-				// TODO Move the duplicate code into a private search helper
-				for (String path : get(word)) {
-					if (!temp.containsKey(path)) {
-						SingleSearchResult result = new SingleSearchResult(path, 
-								wordCount.get(path), get(word, path).size());
-						temp.put(path, result);
-						listPartial.add(result);
-					} 
-					else {
-						temp.get(path).setMatches(get(word, path).size());
-					}
-				}
+				searchHelper(check, list, word);
 			}
 		}
-		Collections.sort(listPartial);
-		return listPartial;
+		Collections.sort(list);
+		return list;
+	}
+	
+	/**
+	 * Helper function that deals with searching
+	 * 
+	 * @param check the hash map that keeps track of values added
+	 * @param list the array list to add a single search result
+	 * @param word the stemmed and cleaned word from the query line
+	 */
+	private void searchHelper(Map<String, SingleSearchResult> check, List<SingleSearchResult> list, String word) {
+		//for each location stored in the inverted index
+		for (String path : map.get(word).keySet()) {
+			//check if map doesn't contain the location
+			if (!check.containsKey(path)) {
+				SingleSearchResult result = new SingleSearchResult(path);
+				check.put(path, result);
+				list.add(result);
+			}
+			//perform a match
+			check.get(path).update(word);
+		}
 	}
 	
 	/**
@@ -289,6 +283,91 @@ public class InvertedIndex {
 		for (String word : words) {
 			add(word, path.toString(), position);
 			position++;
+		}
+	}
+
+	/**
+	 * A non-static inner class that sorts and stores a single search result
+	 * @author Charles Sy
+	 *
+	 */
+	public class SingleSearchResult implements Comparable<SingleSearchResult> {
+		/**
+		 * The location of the text file
+		 */
+		private final String location;
+		/**
+		 * The total number of times any of the matching query words appear in the text file
+		 */
+		public int matches;
+		/**
+		 * The percent of words in the file that match the query
+		 */
+		private double score;
+		
+		/**
+		 * Constructor
+		 * 
+		 * @param location the location of the text file
+		 */
+		public SingleSearchResult(String location) {
+			this.location = location;
+			this.matches = 0;
+		}
+		
+		/**
+		 * Getter
+		 * 
+		 * @return location
+		 */
+		public String getLocation() {
+			return location;
+		}
+		
+		/**
+		 * Getter
+		 * 
+		 * @return total matches
+		 */
+		public int getMatches() {
+			return matches;
+		}
+		
+		/**
+		 * Getter
+		 * 
+		 * @return score
+		 */
+		public double getScore() {
+			return score;
+		}
+		
+
+		/**
+		 * Updates the amount of matches and calculates the score
+		 * 
+		 * @param word the word being matched
+		 */
+		private void update(String word) {
+			matches += map.get(word).get(location).size();
+			score = (double) matches / (double) wordCount.get(location);
+		}
+		
+		@Override
+		public int compareTo(SingleSearchResult other) {
+			int result = Double.compare(other.score, this.score);
+			if (result == 0) {
+				result = Integer.compare(other.matches, this.matches);
+			}
+			if (result == 0) {
+				result = this.location.compareToIgnoreCase(other.location);
+			}
+			return result;
+		}
+		
+		@Override
+		public String toString() {
+			return location + " " + matches + " " + score;
 		}
 	}
 }

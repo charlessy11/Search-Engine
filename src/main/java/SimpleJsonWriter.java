@@ -185,15 +185,15 @@ public class SimpleJsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void asResult(Collection<SingleSearchResult> elements, Writer writer, int level) throws IOException {		
+	public static void asResult(Collection<InvertedIndex.SingleSearchResult> elements, Writer writer, int level) throws IOException {		
 		if (!elements.isEmpty()) {
-			Iterator<SingleSearchResult> iterator = elements.iterator();
-			SingleSearchResult first = iterator.next();
+			Iterator<InvertedIndex.SingleSearchResult> iterator = elements.iterator();
+			InvertedIndex.SingleSearchResult first = iterator.next();
 			SimpleJsonWriter.writeResult(first, writer, level);
 			while (iterator.hasNext()) {
 				writer.write(',');
 				writer.write('\n');
-				SingleSearchResult next = iterator.next();
+				InvertedIndex.SingleSearchResult next = iterator.next();
 				SimpleJsonWriter.writeResult(next, writer, level);
 			}
 		}
@@ -206,7 +206,7 @@ public class SimpleJsonWriter {
 	 * @param writer the writer to use
 	 * @param level the level to use
 	 */
-	public static void writeResult(SingleSearchResult entry, Writer writer, int level) {
+	public static void writeResult(InvertedIndex.SingleSearchResult entry, Writer writer, int level) {
 		try {
 			DecimalFormat FORMATTER = new DecimalFormat("0.00000000");
 			indent("{", writer, level + 1);
@@ -239,7 +239,7 @@ public class SimpleJsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void asNestedResult(Map<String, ? extends Collection<SingleSearchResult>> elements, Writer writer,
+	public static void asNestedResult(Map<String, ? extends Collection<InvertedIndex.SingleSearchResult>> elements, Writer writer,
 			int level) throws IOException {
 		writer.write("{");
 		writer.write('\n');
@@ -266,7 +266,7 @@ public class SimpleJsonWriter {
 	 * @param level the level to use
 	 */
 	public static void writeNestedResult(
-			Entry<String, ? extends Collection<SingleSearchResult>> entry, Writer writer, int level) {
+			Entry<String, ? extends Collection<InvertedIndex.SingleSearchResult>> entry, Writer writer, int level) {
 		try {
 			quote(entry.getKey(), writer, level + 1);
 			writer.write(": ");
@@ -292,7 +292,7 @@ public class SimpleJsonWriter {
 	 * @see #asArray(Collection, Writer, int)
 	 */
 	public static void asNestedResult(
-			Map<String, ? extends Collection<SingleSearchResult>> elements, Path path) 
+			Map<String, ? extends Collection<InvertedIndex.SingleSearchResult>> elements, Path path) 
 			throws IOException {
 		try (
 				BufferedWriter writer = Files.newBufferedWriter(path,
@@ -311,7 +311,7 @@ public class SimpleJsonWriter {
 	 * @see #asNestedArray(Map, Writer, int)
 	 */
 	public static String asNestedResult(
-			Map<String, ? extends Collection<SingleSearchResult>> elements) {
+			Map<String, ? extends Collection<InvertedIndex.SingleSearchResult>> elements) {
 		try {
 			StringWriter writer = new StringWriter();
 			asNestedResult(elements, writer, 0);

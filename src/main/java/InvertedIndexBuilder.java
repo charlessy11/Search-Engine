@@ -50,14 +50,24 @@ public class InvertedIndexBuilder {
 	}
 	
 	/**
-	 * Reads a file line by line, parses each line into cleaned and stemmed words,
-	 * then adds word, location, and position to inverted index.
+	 * Calls addData(path, invertedIndex) function
 	 * 
 	 * @param path the path of the file
 	 * @throws IOException if an IO error occurs
 	 */
 	public void addData(Path path) throws IOException {
-		// TODO addData(path, this.invertedIndex);
+		 addData(path, this.invertedIndex);
+	}
+	
+	/**
+	 * Reads a file line by line, parses each line into cleaned and stemmed words,
+	 * then adds word, location, and position to inverted index.
+	 * 
+	 * @param path the path of the file
+	 * @param invertedIndex the inverted index to build
+	 * @throws IOException if an IO error occurs
+	 */
+	public static void addData(Path path, InvertedIndex invertedIndex) throws IOException {
 		//open file for reading
 		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {
 			int position = 1; //position start at index 1
@@ -73,22 +83,4 @@ public class InvertedIndexBuilder {
 			}
 		}
 	}
-	
-	/* TODO 
-	public static void addData(Path path, InvertedIndex invertedIndex) throws IOException {
-		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8);) {
-			int position = 1; //position start at index 1
-			Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
-			String line = null;
-			String location = path.toString();
-			while ((line = read.readLine()) != null) {
-				for (String word : TextParser.parse(line)) {
-					//add to inverted index
-					invertedIndex.add(stemmer.stem(word).toString(), location, position);
-					position++;
-				}
-			}
-		}
-	}
-	*/
 }
