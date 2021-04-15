@@ -1,6 +1,13 @@
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.TreeSet;
 
+/**
+ * The multithreaded and thread-safe query result builder.
+ * 
+ * @author Charles Sy
+ *
+ */
 public class ThreadSafeQueryResultBuilder extends QueryResultBuilder{
 
 	/**
@@ -8,6 +15,12 @@ public class ThreadSafeQueryResultBuilder extends QueryResultBuilder{
 	 */
 	private final WorkQueue queue;
 	
+	/**
+	 * Constructor
+	 * 
+	 * @param invertedIndex the multithreaded and thread-safe inverted index
+	 * @param queue the work queue for multithreading
+	 */
 	public ThreadSafeQueryResultBuilder(ConcurrentInvertedIndex invertedIndex, WorkQueue queue) {
 		super(invertedIndex);
 		this.queue = queue;
@@ -15,7 +28,18 @@ public class ThreadSafeQueryResultBuilder extends QueryResultBuilder{
 	
 	@Override
 	public void parseQuery(Path path, boolean exact) throws IOException {
-		queue.execute(new Task(path, exact));
+		super.parseQuery(path, exact);
+		try {
+			queue.finish();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		queue.shutdown();
+	}
+	
+	@Override
+	public void parseQuery(String line, boolean exact) {
+		queue.execute(new Task(line, exact));
 	}
 	
 	@Override
@@ -23,19 +47,38 @@ public class ThreadSafeQueryResultBuilder extends QueryResultBuilder{
 		super.toJsonNestedResult(path);
 	}
 	
+	/**
+	 * The non-static task class that provides functionality to threads in the runnable state.
+	 * 
+	 * @author Charles Sy
+	 *
+	 */
 	private class Task implements Runnable {
 		
-		private final Path path;
+		/**
+		 * The line being cleaned and parsed
+		 */
+		private final String line;
+		/**
+		 * The flag that determines what type of search to perform
+		 */
 		private final boolean exact;
 		
-		public Task(Path path, boolean exact) {
-			this.path = path;
+		/**
+		 * Constructor
+		 * 
+		 * @param line the line being cleaned and parsed
+		 * @param exact the flag that determines what type of search to perform
+		 */
+		public Task(String line, boolean exact) {
+			this.line = line;
 			this.exact = exact;
 		}
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
-			
+			TreeSet<String> query = TextFileStemmer.uniqueStems(line);
+			ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
+			threadSafe.search(query, exact);
 		}
 	}
 }

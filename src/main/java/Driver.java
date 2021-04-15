@@ -48,8 +48,10 @@ public class Driver {
 			WorkQueue queue = new WorkQueue(workerThreads);
 			//initialize invertedIndex to use thread safe version
 			invertedIndex = threadSafe;
-			//initialize indexBuilder to use thread safe version
+			//initialize inverted index builder to use thread safe version and work queue
 			indexBuilder = new ThreadSafeInvertedIndexBuilder(threadSafe, queue);
+			//initialize query result builder to use thread safe version and work queue
+			resultBuilder = new ThreadSafeQueryResultBuilder(threadSafe, queue);
 		}
 		
 		//perform single-threading
