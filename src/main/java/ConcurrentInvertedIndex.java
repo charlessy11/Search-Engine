@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Set;
 
 /**
  * A thread-safe version of IndvertedIndex using a custom read/write lock.
@@ -155,7 +155,7 @@ public class ConcurrentInvertedIndex extends InvertedIndex {
 	}
 	
 	@Override
-	public List<SingleSearchResult> exactSearch(TreeSet<String> line) {
+	public List<SingleSearchResult> exactSearch(Set<String> line) {
 		lock.readLock().lock();
 
 		try {
@@ -167,7 +167,7 @@ public class ConcurrentInvertedIndex extends InvertedIndex {
 	}
 	
 	@Override
-	public List<SingleSearchResult> partialSearch(TreeSet<String> line) {
+	public List<SingleSearchResult> partialSearch(Set<String> line) {
 		lock.readLock().lock();
 
 		try {

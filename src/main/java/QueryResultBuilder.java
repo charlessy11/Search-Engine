@@ -24,7 +24,7 @@ public class QueryResultBuilder {
 	/**
 	 * Stores single search results
 	 */
-	private final Map<String, Collection<SingleSearchResult>> results;
+	private final Map<String, Collection<InvertedIndex.SingleSearchResult>> results;
 	
 	/**
 	 * Constructor

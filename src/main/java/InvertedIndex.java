@@ -3,11 +3,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 import java.util.Set;
 
 /**
@@ -32,7 +32,7 @@ public class InvertedIndex {
 	 * Constructor defines map
 	 */
 	public InvertedIndex() {
-		this.map = new TreeMap<String, TreeMap<String, Set<Integer>>>(); 
+		this.map = new TreeMap<String, TreeMap<String, Set<Integer>>>();
 		this.wordCount =  new TreeMap<>();
 	}
 	
@@ -46,8 +46,10 @@ public class InvertedIndex {
 	public void add(String word, String location, Integer position) {
 		map.putIfAbsent(word, new TreeMap<>());
 		map.get(word).putIfAbsent(location, new TreeSet<>());
-		map.get(word).get(location).add(position);
-		wordCount.put(location, position);
+		if (map.get(word).get(location).add(position)) {
+			//only update if current value is less than the new one
+			wordCount.merge(location, position, Integer::max);
+		}
 	}
 	
 	/**
@@ -182,64 +184,82 @@ public class InvertedIndex {
 		SimpleJsonWriter.asNested(map, path);
 	}
 	
+	/**
+	 * Helper method that determines what type of search to perform
+	 * 
+	 * @param queries the parsed words from a single line of the query file
+	 * @param exact the flag that determines what type of search to perform
+	 * @return a sorted list of search results
+	 */
+	public List<SingleSearchResult> search(Set<String> queries, boolean exact) {
+		if (exact) {
+			return exactSearch(queries);
+		} else {
+			return partialSearch(queries);
+		}
+	}
 	
 	/**
 	 * Performs exact search
 	 * 
-	 * @param line the parsed words from a single line of the query file
+	 * @param queries the parsed words from a single line of the query file
 	 * @return sorted list of search results
 	 */
-	public List<SingleSearchResult> exactSearch(TreeSet<String> line) {
-		Map<String, SingleSearchResult> temp = new TreeMap<>();
-		List<SingleSearchResult> listExact = new ArrayList<>();
-		for (String word : line) {
-			//check if word is stored in inverted index
+	public List<SingleSearchResult> exactSearch(Set<String> queries) {
+		/* Keeps track of values added. Necessary to easily lookup values that we've already processed, thus 
+		 * eliminating duplicate paths and search results. Searching is faster w/ maps rather than lists. */
+		Map<String, SingleSearchResult> check = new HashMap<>(); 
+		List<SingleSearchResult> list = new ArrayList<>();
+		//for each parsed word from set
+		for (String word : queries) {
 			if (contains(word)) {
-				for (String path : get(word)) {
-					if (!temp.containsKey(path)) {
-						temp.put(path, 
-								new SingleSearchResult(path, wordCount.get(path), get(word, path).size()));
-					}
-					else {
-						temp.get(path).setMatches(get(word, path).size());
-					}
-				}
+				searchHelper(check, list, word);
 			}
 		}
-		listExact = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
-		Collections.sort(listExact);
-		return listExact;
+		Collections.sort(list);
+		return list;
 	}
 	
 	/**
 	 * Performs partial search
 	 * 
-	 * @param line the parsed words from a single line of the query file
+	 * @param queries the parsed words from a single line of the query file
 	 * @return sorted list of search results
 	 */
-	public List<SingleSearchResult> partialSearch(TreeSet<String> line) {
-		Map<String, SingleSearchResult> temp = new TreeMap<>();
-		List<SingleSearchResult> listPartial = new ArrayList<>();
-		for (String word : line) {
-			var iterator = map.entrySet().iterator();
-			while (iterator.hasNext()) {
-				var entry = iterator.next();
-				if (entry.getKey().startsWith(word)) {
-					for (String path : get(entry.getKey())) {
-						if (!temp.containsKey(path)) {
-							temp.put(path, new SingleSearchResult(path, 
-									wordCount.get(path), get(entry.getKey(), path).size()));
-						} 
-						else {
-							temp.get(path).setMatches(get(entry.getKey(), path).size());
-						}
-					}
-				}
+	public List<SingleSearchResult> partialSearch(Set<String> queries) {
+		Map<String, SingleSearchResult> check = new HashMap<>();
+		List<SingleSearchResult> list = new ArrayList<>();
+		for (String query : queries) { 
+			for (String word : map.tailMap(query).keySet()) {
+				if (!word.startsWith(query)) {
+					break;
+				} 
+				searchHelper(check, list, word);
 			}
 		}
-		listPartial = temp.values().stream().collect(Collectors.toList()); //copies values from temp to list
-		Collections.sort(listPartial);
-		return listPartial;
+		Collections.sort(list);
+		return list;
+	}
+	
+	/**
+	 * Helper function that deals with searching
+	 * 
+	 * @param check the hash map that keeps track of values added
+	 * @param list the array list to add a single search result
+	 * @param word the stemmed and cleaned word from the query line
+	 */
+	private void searchHelper(Map<String, SingleSearchResult> check, List<SingleSearchResult> list, String word) {
+		//for each location stored in the inverted index
+		for (String path : map.get(word).keySet()) {
+			//check if map doesn't contain the location
+			if (!check.containsKey(path)) {
+				SingleSearchResult result = new SingleSearchResult(path);
+				check.put(path, result);
+				list.add(result);
+			}
+			//perform a match
+			check.get(path).update(word);
+		}
 	}
 	
 	/**
@@ -263,6 +283,91 @@ public class InvertedIndex {
 		for (String word : words) {
 			add(word, path.toString(), position);
 			position++;
+		}
+	}
+
+	/**
+	 * A non-static inner class that sorts and stores a single search result
+	 * @author Charles Sy
+	 *
+	 */
+	public class SingleSearchResult implements Comparable<SingleSearchResult> {
+		/**
+		 * The location of the text file
+		 */
+		private final String location;
+		/**
+		 * The total number of times any of the matching query words appear in the text file
+		 */
+		public int matches;
+		/**
+		 * The percent of words in the file that match the query
+		 */
+		private double score;
+		
+		/**
+		 * Constructor
+		 * 
+		 * @param location the location of the text file
+		 */
+		public SingleSearchResult(String location) {
+			this.location = location;
+			this.matches = 0;
+		}
+		
+		/**
+		 * Getter
+		 * 
+		 * @return location
+		 */
+		public String getLocation() {
+			return location;
+		}
+		
+		/**
+		 * Getter
+		 * 
+		 * @return total matches
+		 */
+		public int getMatches() {
+			return matches;
+		}
+		
+		/**
+		 * Getter
+		 * 
+		 * @return score
+		 */
+		public double getScore() {
+			return score;
+		}
+		
+
+		/**
+		 * Updates the amount of matches and calculates the score
+		 * 
+		 * @param word the word being matched
+		 */
+		private void update(String word) {
+			matches += map.get(word).get(location).size();
+			score = (double) matches / (double) wordCount.get(location);
+		}
+		
+		@Override
+		public int compareTo(SingleSearchResult other) {
+			int result = Double.compare(other.score, this.score);
+			if (result == 0) {
+				result = Integer.compare(other.matches, this.matches);
+			}
+			if (result == 0) {
+				result = this.location.compareToIgnoreCase(other.location);
+			}
+			return result;
+		}
+		
+		@Override
+		public String toString() {
+			return location + " " + matches + " " + score;
 		}
 	}
 }
