@@ -36,9 +36,8 @@ public class QueryResultBuilder {
 		this.results = new TreeMap<>();
 	}
 	
-	
 	/**
-	 * Cleans, parses and sorts each query line
+	 * Opens and reads file line by line then cleans, parses and sorts each query line
 	 * 
 	 * @param path the path of the file
 	 * @param exact to check if exact/partial search
@@ -48,23 +47,26 @@ public class QueryResultBuilder {
 		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
 			String line;
 			while ((line = read.readLine()) != null) {
-				//assigns set a set of unique, cleaned and stemmed words parsed from line
-				TreeSet<String> set = TextFileStemmer.uniqueStems(line);
-				if (exact == true) {
-					if (!set.isEmpty()) {
-						//puts a new string from set separated by spaces as key and list of search results as value
-						results.put(String.join(" ", set), invertedIndex.exactSearch(set));
-					}
-				}
-				else {
-					if (!set.isEmpty()) {
-						results.put(String.join(" ", set), invertedIndex.partialSearch(set));
-					}
-				}
+				parseQuery(line, exact);
 			}
 		}
 	}
 	
+	/**
+	 * Cleans, parses and sorts each query line
+	 * 
+	 * @param line the line to be cleaned and parsed
+	 * @param exact the flag that determines what type of search to perform
+	 */
+	public void parseQuery(String line, boolean exact) {
+		TreeSet<String> set = TextFileStemmer.uniqueStems(line);
+		if (!set.isEmpty()) {
+			String cleaned = String.join(" ", set);
+			if (!results.containsKey(cleaned)) {
+				results.put(cleaned, invertedIndex.search(set, exact));
+			}
+		}
+	}
 	
 	/**
 	 * Calls SimpleJsonWriter's asNestedResult method
