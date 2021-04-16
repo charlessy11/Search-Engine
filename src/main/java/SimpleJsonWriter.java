@@ -226,7 +226,7 @@ public class SimpleJsonWriter {
 			writer.write(FORMATTER.format(entry.getScore()));
 			writer.write('\n');
 			indent("}", writer, level + 1);
-		} catch (IOException e) {
+		} catch (IOException e) { // TODO Throw exception instead, remove try/catch
 			e.printStackTrace();
 		}
 	}
@@ -277,7 +277,7 @@ public class SimpleJsonWriter {
 			}
 			writer.write('\n');
 			indent("]", writer, level + 1);
-		} catch (IOException e) {
+		} catch (IOException e) { // TODO Fix!
 			e.printStackTrace();
 		}
 	}
