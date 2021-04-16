@@ -24,9 +24,40 @@ public class Driver {
 		Instant start = Instant.now();
 
 		ArgumentMap map = new ArgumentMap(args); //parses command-line arguments
-		InvertedIndex invertedIndex = new InvertedIndex();
-		InvertedIndexBuilder indexBuilder = new InvertedIndexBuilder(invertedIndex);
-		QueryResultBuilder resultBuilder = new QueryResultBuilder(invertedIndex);
+		InvertedIndex invertedIndex;
+		InvertedIndexBuilder indexBuilder;
+		QueryResultBuilder resultBuilder;
+		
+		int workerThreads = 0;
+		ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
+		
+		//perform multithreading
+		if (map.hasFlag("-threads")) {
+			try {
+				//invalid num of worker threads provided
+				if (map.hasValue("-threads") && map.getInteger("-threads") <= 0) {
+					workerThreads = 5; //default value
+				} else {
+					//set worker threads to value or 5 as default value
+					workerThreads = map.getInteger("-threads", 5);
+				}
+			} catch (NumberFormatException e) {
+				System.out.println("Error: Unable to perform multithreading.");
+			}
+			//initialize workQueue to num of worker threads
+			WorkQueue queue = new WorkQueue(workerThreads);
+			//initialize invertedIndex to use thread safe version
+			invertedIndex = threadSafe;
+			//initialize inverted index builder to use thread safe version and work queue
+			indexBuilder = new MultithreadedInvertedIndexBuilder(threadSafe, queue);
+			//initialize query result builder to use thread safe version and work queue
+			resultBuilder = new MultithreadedQueryResultBuilder(threadSafe, queue);
+		}
+		
+		//perform single-threading
+		invertedIndex = new InvertedIndex();
+		indexBuilder = new InvertedIndexBuilder(invertedIndex);
+		resultBuilder = new QueryResultBuilder(invertedIndex);
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
