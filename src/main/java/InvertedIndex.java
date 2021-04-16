@@ -299,7 +299,7 @@ public class InvertedIndex {
 		/**
 		 * The total number of times any of the matching query words appear in the text file
 		 */
-		public int matches; // TODO private
+		private int matches;
 		/**
 		 * The percent of words in the file that match the query
 		 */

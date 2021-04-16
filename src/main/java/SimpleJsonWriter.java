@@ -205,30 +205,27 @@ public class SimpleJsonWriter {
 	 * @param entry the entry to write
 	 * @param writer the writer to use
 	 * @param level the level to use
+	 * @throws IOException if an IO error occurs
 	 */
-	public static void writeResult(InvertedIndex.SingleSearchResult entry, Writer writer, int level) {
-		try {
-			DecimalFormat FORMATTER = new DecimalFormat("0.00000000");
-			indent("{", writer, level + 1);
-			writer.write('\n');
-			quote("where", writer, level + 2);
-			writer.write(": ");
-			quote(entry.getLocation(), writer, level - 1);
-			writer.write(',');
-			writer.write('\n');
-			quote("count", writer, level + 2);
-			writer.write(": ");
-			writer.write(Integer.toString(entry.getMatches()));
-			writer.write(',');
-			writer.write('\n');
-			quote("score", writer, level + 2);
-			writer.write(": ");
-			writer.write(FORMATTER.format(entry.getScore()));
-			writer.write('\n');
-			indent("}", writer, level + 1);
-		} catch (IOException e) { // TODO Throw exception instead, remove try/catch
-			e.printStackTrace();
-		}
+	public static void writeResult(InvertedIndex.SingleSearchResult entry, Writer writer, int level) throws IOException {
+		DecimalFormat FORMATTER = new DecimalFormat("0.00000000");
+		indent("{", writer, level + 1);
+		writer.write('\n');
+		quote("where", writer, level + 2);
+		writer.write(": ");
+		quote(entry.getLocation(), writer, level - 1);
+		writer.write(',');
+		writer.write('\n');
+		quote("count", writer, level + 2);
+		writer.write(": ");
+		writer.write(Integer.toString(entry.getMatches()));
+		writer.write(',');
+		writer.write('\n');
+		quote("score", writer, level + 2);
+		writer.write(": ");
+		writer.write(FORMATTER.format(entry.getScore()));
+		writer.write('\n');
+		indent("}", writer, level + 1);
 	}
 	
 	/**
@@ -264,22 +261,19 @@ public class SimpleJsonWriter {
 	 * @param entry the entry to write
 	 * @param writer the writer to use
 	 * @param level the level to use
+	 * @throws IOException if an IO error occurs
 	 */
 	public static void writeNestedResult(
-			Entry<String, ? extends Collection<InvertedIndex.SingleSearchResult>> entry, Writer writer, int level) {
-		try {
-			quote(entry.getKey(), writer, level + 1);
-			writer.write(": ");
-			writer.write("[");
-			if (!entry.getValue().isEmpty()) {
-				writer.write('\n');
-				SimpleJsonWriter.asResult(entry.getValue(), writer, level + 1);
-			}
+		Entry<String, ? extends Collection<InvertedIndex.SingleSearchResult>> entry, Writer writer, int level) throws IOException {
+		quote(entry.getKey(), writer, level + 1);
+		writer.write(": ");
+		writer.write("[");
+		if (!entry.getValue().isEmpty()) {
 			writer.write('\n');
-			indent("]", writer, level + 1);
-		} catch (IOException e) { // TODO Fix!
-			e.printStackTrace();
+			SimpleJsonWriter.asResult(entry.getValue(), writer, level + 1);
 		}
+		writer.write('\n');
+		indent("]", writer, level + 1);
 	}
 	
 	/**
