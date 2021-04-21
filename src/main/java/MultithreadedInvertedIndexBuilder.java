@@ -15,6 +15,8 @@ public class MultithreadedInvertedIndexBuilder extends InvertedIndexBuilder {
 	 */
 	private final WorkQueue queue;
 	
+	// TODO private final ConcurrentInvertedIndex invertedIndex;
+	
 	/**
 	 * Constructor
 	 * 
@@ -24,6 +26,7 @@ public class MultithreadedInvertedIndexBuilder extends InvertedIndexBuilder {
 	public MultithreadedInvertedIndexBuilder(ConcurrentInvertedIndex invertedIndex, WorkQueue queue) {
 		super(invertedIndex);
 		this.queue = queue;
+		// TODO this.invertedIndex = ...
 	}
 	
 	@Override
@@ -32,9 +35,9 @@ public class MultithreadedInvertedIndexBuilder extends InvertedIndexBuilder {
 		try {
 			queue.finish();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			e.printStackTrace(); // TODO Thread.currentThread().interrupt()
 		}
-		queue.shutdown();
+		queue.shutdown(); // TODO finish(), call shutdown in the context you create the work queue
 	}
 	
 	@Override 
@@ -72,6 +75,8 @@ public class MultithreadedInvertedIndexBuilder extends InvertedIndexBuilder {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			// TODO Now what? All of the data is in local, not in invertedIndex
+			// TODO invertedIndex.addAll(local);
 		}
 	}
 }

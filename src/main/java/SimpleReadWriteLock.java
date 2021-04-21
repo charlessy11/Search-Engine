@@ -46,7 +46,7 @@ public class SimpleReadWriteLock {
 	 * @see <a href="https://wiki.sei.cmu.edu/confluence/display/java/LCK00-J.+Use+private+final+lock+objects+to+synchronize+classes+that+may+interact+with+untrusted+code">
 	 *      SEI CERT Oracle Coding Standard for Java</a>
 	 */
-	private Object lock;
+	private Object lock; // TODO final
 
 	/**
 	 * Initializes a new simple read/write lock.
@@ -156,7 +156,7 @@ public class SimpleReadWriteLock {
 					throw new IllegalStateException("Error.");
 				} else {
 					readers--;
-					lock.notifyAll();
+					lock.notifyAll(); // TODO Over-notification
 				}
 			}
 		}
@@ -207,7 +207,7 @@ public class SimpleReadWriteLock {
 					throw new ConcurrentModificationException("Error.");
 				} else {
 					writers--;
-					lock.notifyAll();
+					lock.notifyAll(); // TODO Move inside of if block below
 					if (writers == 0) {
 						activeWriter = null;
 					}

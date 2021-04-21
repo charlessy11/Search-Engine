@@ -30,6 +30,7 @@ public class Driver {
 		
 		int workerThreads = 0;
 		ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
+		// TODO WorkQueue queue = null;
 		
 		//perform multithreading
 		if (map.hasFlag("-threads")) {
@@ -53,7 +54,7 @@ public class Driver {
 			//initialize query result builder to use thread safe version and work queue
 			resultBuilder = new MultithreadedQueryResultBuilder(threadSafe, queue);
 		}
-		
+		// TODO This needs to be in an else...
 		//perform single-threading
 		invertedIndex = new InvertedIndex();
 		indexBuilder = new InvertedIndexBuilder(invertedIndex);
@@ -114,6 +115,10 @@ public class Driver {
 				System.out.println("Warning: No output file produced of search results but still performed the search operation..");
 			}
 		}
+		
+		/*
+		 * TODO if (queue != null) { queue.shutdown(); }
+		 */
 		
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());

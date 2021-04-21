@@ -14,7 +14,7 @@ import java.util.TreeSet;
  * @author Charles Sy
  *
  */
-public class QueryResultBuilder {
+public class QueryResultBuilder { // TODO Make your members public for now
 	
 	/**
 	 * The inverted index to search

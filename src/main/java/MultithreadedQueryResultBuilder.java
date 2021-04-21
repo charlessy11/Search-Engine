@@ -78,7 +78,7 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 		public void run() {
 			TreeSet<String> query = TextFileStemmer.uniqueStems(line);
 			ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
-			threadSafe.search(query, exact);
+			threadSafe.search(query, exact); // TODO Not saving or storing
 		}
 	}
 }
