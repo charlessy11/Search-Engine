@@ -30,13 +30,13 @@ public class Driver {
 		
 		int workerThreads = 0;
 		ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
-		// TODO WorkQueue queue = null;
+		WorkQueue queue = null;
 		
 		//perform multithreading
 		if (map.hasFlag("-threads")) {
 			try {
 				//invalid num of worker threads provided
-				if (map.hasValue("-threads") && map.getInteger("-threads") <= 0) {
+				if ((map.hasValue("-threads") && map.getInteger("-threads") <= 0)) {
 					workerThreads = 5; //default value
 				} else {
 					//set worker threads to value or 5 as default value
@@ -44,9 +44,10 @@ public class Driver {
 				}
 			} catch (NumberFormatException e) {
 				System.out.println("Error: Unable to perform multithreading.");
+				workerThreads = 5;
 			}
 			//initialize workQueue to num of worker threads
-			WorkQueue queue = new WorkQueue(workerThreads);
+			queue = new WorkQueue(workerThreads);
 			//initialize invertedIndex to use thread safe version
 			invertedIndex = threadSafe;
 			//initialize inverted index builder to use thread safe version and work queue
@@ -54,11 +55,12 @@ public class Driver {
 			//initialize query result builder to use thread safe version and work queue
 			resultBuilder = new MultithreadedQueryResultBuilder(threadSafe, queue);
 		}
-		// TODO This needs to be in an else...
-		//perform single-threading
-		invertedIndex = new InvertedIndex();
-		indexBuilder = new InvertedIndexBuilder(invertedIndex);
-		resultBuilder = new QueryResultBuilder(invertedIndex);
+		else {
+			//perform single-threading
+			invertedIndex = new InvertedIndex();
+			indexBuilder = new InvertedIndexBuilder(invertedIndex);
+			resultBuilder = new QueryResultBuilder(invertedIndex);
+		}
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
@@ -116,9 +118,9 @@ public class Driver {
 			}
 		}
 		
-		/*
-		 * TODO if (queue != null) { queue.shutdown(); }
-		 */
+		if (queue != null) { 
+			queue.shutdown(); 
+		}
 		
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());

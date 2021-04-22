@@ -27,7 +27,31 @@ public class ConcurrentInvertedIndex extends InvertedIndex {
 		lock.writeLock().lock();
 
 		try {
-			super.add(word, location, position);;
+			super.add(word, location, position);
+		}
+		finally {
+			lock.writeLock().unlock();
+		}
+	}
+	
+	@Override
+	public void addAll(Collection<String> words, Path path) {
+		lock.writeLock().lock();
+
+		try {
+			super.addAll(words, path);
+		}
+		finally {
+			lock.writeLock().unlock();
+		}
+	}
+	
+	@Override
+	public void addAll(InvertedIndex other) {
+		lock.writeLock().lock();
+
+		try {
+			super.addAll(other);;
 		}
 		finally {
 			lock.writeLock().unlock();
@@ -154,17 +178,17 @@ public class ConcurrentInvertedIndex extends InvertedIndex {
 		}
 	}
 	
-	@Override
-	public List<SingleSearchResult> search(Set<String> queries, boolean exact) {
-		lock.readLock().lock();
-
-		try {
-			return super.search(queries, exact);
-		}
-		finally {
-			lock.readLock().unlock();
-		}
-	}
+//	@Override
+//	public List<SingleSearchResult> search(Set<String> queries, boolean exact) {
+//		lock.readLock().lock();
+//
+//		try {
+//			return super.search(queries, exact);
+//		}
+//		finally {
+//			lock.readLock().unlock();
+//		}
+//	}
 	
 	@Override
 	public List<SingleSearchResult> exactSearch(Set<String> line) {

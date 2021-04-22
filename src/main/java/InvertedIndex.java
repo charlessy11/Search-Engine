@@ -285,6 +285,33 @@ public class InvertedIndex {
 			position++;
 		}
 	}
+	
+	/**
+	 * Merges other inverted index to current inverted index
+	 * 
+	 * @param other the other inverted index
+	 */
+	public void addAll(InvertedIndex other) {
+		// merge inverted index
+		for (String word : other.map.keySet()) {
+			if (this.map.containsKey(word)) {
+				for (String location : other.map.get(word).keySet()) {
+					if (this.map.get(word).containsKey(location)) {
+						this.map.get(word).get(location).addAll(other.map.get(word).get(location));
+					} else {
+						this.map.get(word).put(location, other.map.get(word).get(location));
+					}
+				}
+			} else {
+				this.map.put(word, other.map.get(word));
+			}
+		}
+		// merge word count
+		for (String location : other.wordCount.keySet()) {
+			int count = other.wordCount.get(location) + this.wordCount.getOrDefault(location, 0);
+			this.wordCount.put(location, count);
+		}
+	}
 
 	/**
 	 * A non-static inner class that sorts and stores a single search result

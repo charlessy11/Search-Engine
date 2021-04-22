@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.TreeSet;
 
 /**
@@ -16,6 +17,11 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 	private final WorkQueue queue;
 	
 	/**
+	 * The thread safe inverted index
+	 */
+//	private final ConcurrentInvertedIndex invertedIndex;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param invertedIndex the multithreaded and thread-safe inverted index
@@ -24,6 +30,7 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 	public MultithreadedQueryResultBuilder(ConcurrentInvertedIndex invertedIndex, WorkQueue queue) {
 		super(invertedIndex);
 		this.queue = queue;
+//		this.invertedIndex = invertedIndex;
 	}
 	
 	@Override
@@ -32,9 +39,8 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 		try {
 			queue.finish();
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			Thread.currentThread().interrupt();
 		}
-		queue.shutdown();
 	}
 	
 	@Override
@@ -77,8 +83,13 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 		@Override
 		public void run() {
 			TreeSet<String> query = TextFileStemmer.uniqueStems(line);
-			ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
-			threadSafe.search(query, exact); // TODO Not saving or storing
+			if (!query.isEmpty()) {
+				String cleaned = String.join(" ", query);
+				List<InvertedIndex.SingleSearchResult> list = invertedIndex.search(query, exact);
+				synchronized (results) {
+					results.put(cleaned, list);
+				}
+			}
 		}
 	}
 }

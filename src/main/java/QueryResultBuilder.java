@@ -14,17 +14,17 @@ import java.util.TreeSet;
  * @author Charles Sy
  *
  */
-public class QueryResultBuilder { // TODO Make your members public for now
+public class QueryResultBuilder {
 	
 	/**
 	 * The inverted index to search
 	 */
-	private final InvertedIndex invertedIndex;
+	public InvertedIndex invertedIndex;
 	
 	/**
 	 * Stores single search results
 	 */
-	private final Map<String, Collection<InvertedIndex.SingleSearchResult>> results;
+	public Map<String, Collection<InvertedIndex.SingleSearchResult>> results;
 	
 	/**
 	 * Constructor

@@ -46,7 +46,7 @@ public class SimpleReadWriteLock {
 	 * @see <a href="https://wiki.sei.cmu.edu/confluence/display/java/LCK00-J.+Use+private+final+lock+objects+to+synchronize+classes+that+may+interact+with+untrusted+code">
 	 *      SEI CERT Oracle Coding Standard for Java</a>
 	 */
-	private Object lock; // TODO final
+	private final Object lock;
 
 	/**
 	 * Initializes a new simple read/write lock.
@@ -131,7 +131,7 @@ public class SimpleReadWriteLock {
 		@Override
 		public void lock() {
 			synchronized (lock) {
-				while (writers > 0 && !isActiveWriter()) {
+				while (!isActiveWriter() && writers > 0) {
 					try {
 						lock.wait();
 					}
@@ -139,7 +139,9 @@ public class SimpleReadWriteLock {
 						Thread.currentThread().interrupt();
 					}
 				}
-				readers++;
+				if (writers == 0 || isActiveWriter()) {
+					readers++;
+				}
 			}
 		}
 
@@ -152,11 +154,20 @@ public class SimpleReadWriteLock {
 		@Override
 		public void unlock() throws IllegalStateException {
 			synchronized (lock) {
-				if (readers == 0) {
+				if (readers <= 0) {
 					throw new IllegalStateException("Error.");
-				} else {
+				} 
+//				if (readers > 0 && writers >= 0) {
+//					readers--;
+//				}
+//				if (readers == 0) {
+//					lock.notifyAll();
+//				}
+				else {
 					readers--;
-					lock.notifyAll(); // TODO Over-notification
+					if (readers == 0) {
+						lock.notifyAll();
+					}
 				}
 			}
 		}
@@ -177,15 +188,17 @@ public class SimpleReadWriteLock {
 		@Override
 		public void lock() {
 			synchronized (lock) {
-				while ((writers > 0 || readers > 0) && !isActiveWriter()) {
+				while (!isActiveWriter() && (writers > 0 || readers > 0)) {
 					try {
 						lock.wait();
 					} catch (InterruptedException e) {
 						Thread.currentThread().interrupt();
 					}
 				}	
-				writers++;
-				activeWriter = Thread.currentThread();
+				if (isActiveWriter() || writers == 0 || readers == 0) {
+					writers++;
+					activeWriter = Thread.currentThread();
+				}
 			}
 		}
 
@@ -200,16 +213,16 @@ public class SimpleReadWriteLock {
 		@Override
 		public void unlock() throws IllegalStateException, ConcurrentModificationException {
 			synchronized (lock) {
-				if (writers == 0) {
+				if (writers <= 0) {
 					throw new IllegalStateException("Error.");
 				}
 				else if (!isActiveWriter()) {
 					throw new ConcurrentModificationException("Error.");
 				} else {
 					writers--;
-					lock.notifyAll(); // TODO Move inside of if block below
 					if (writers == 0) {
 						activeWriter = null;
+						lock.notifyAll();
 					}
 				}
 			}

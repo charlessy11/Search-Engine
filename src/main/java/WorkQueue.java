@@ -99,18 +99,18 @@ public class WorkQueue {
 	/**
 	 * Increments the value of pending work
 	 */
-	public synchronized void incrementPending() { // TODO private
+	private synchronized void incrementPending() {
 		pending++;
 	}
 
 	/**
 	 * Decrements the value of pending work then notifies
 	 */
-	public synchronized void decrementPending() { // TODO private
+	private synchronized void decrementPending() {
 		pending--;
-		
-		// TODO Put this in an if pending is 0 block
-		this.notifyAll(); // TODO over-notification
+		if (pending == 0) {
+			this.notifyAll();
+		}
 	}
 
 	/**
