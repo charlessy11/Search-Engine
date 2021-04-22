@@ -17,11 +17,6 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 	private final WorkQueue queue;
 	
 	/**
-	 * The thread safe inverted index
-	 */
-//	private final ConcurrentInvertedIndex invertedIndex;
-	
-	/**
 	 * Constructor
 	 * 
 	 * @param invertedIndex the multithreaded and thread-safe inverted index
@@ -30,7 +25,6 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 	public MultithreadedQueryResultBuilder(ConcurrentInvertedIndex invertedIndex, WorkQueue queue) {
 		super(invertedIndex);
 		this.queue = queue;
-//		this.invertedIndex = invertedIndex;
 	}
 	
 	@Override

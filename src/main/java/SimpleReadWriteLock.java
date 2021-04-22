@@ -157,12 +157,6 @@ public class SimpleReadWriteLock {
 				if (readers <= 0) {
 					throw new IllegalStateException("Error.");
 				} 
-//				if (readers > 0 && writers >= 0) {
-//					readers--;
-//				}
-//				if (readers == 0) {
-//					lock.notifyAll();
-//				}
 				else {
 					readers--;
 					if (readers == 0) {

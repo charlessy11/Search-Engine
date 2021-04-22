@@ -178,18 +178,6 @@ public class ConcurrentInvertedIndex extends InvertedIndex {
 		}
 	}
 	
-//	@Override
-//	public List<SingleSearchResult> search(Set<String> queries, boolean exact) {
-//		lock.readLock().lock();
-//
-//		try {
-//			return super.search(queries, exact);
-//		}
-//		finally {
-//			lock.readLock().unlock();
-//		}
-//	}
-	
 	@Override
 	public List<SingleSearchResult> exactSearch(Set<String> line) {
 		lock.readLock().lock();
