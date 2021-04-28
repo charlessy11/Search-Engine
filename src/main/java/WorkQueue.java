@@ -94,6 +94,8 @@ public class WorkQueue {
 		while (pending > 0) {
 			this.wait();
 		}
+		
+		// TODO Catch the interrupted exception, in the catch just do Thread.currentThread().interrupt()
 	}
 	
 	/**

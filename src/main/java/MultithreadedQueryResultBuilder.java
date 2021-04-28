@@ -3,6 +3,16 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.TreeSet;
 
+/*
+ * TODO Create a shared INTERFACE have both classes implement that interface
+ * 
+ * Move the parseQuery(Path, boolean) implementation as a default method in the interface
+ * QueryResultBuilderInterface.super.parseQuery(path, exact);
+ * 
+ * Both classes then have its own private data
+ * 
+ */
+
 /**
  * The multithreaded and thread-safe query result builder.
  * 
@@ -44,7 +54,7 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 	
 	@Override
 	public void toJsonNestedResult(Path path) throws IOException {
-		super.toJsonNestedResult(path);
+		super.toJsonNestedResult(path); // TODO Not synchronized 
 	}
 	
 	/**
@@ -79,6 +89,14 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 			TreeSet<String> query = TextFileStemmer.uniqueStems(line);
 			if (!query.isEmpty()) {
 				String cleaned = String.join(" ", query);
+				/* TODO 
+				synchronized (results) {
+					if (results.containsKey(cleaned)) {
+						return;
+					}
+				}
+				*/
+				
 				List<InvertedIndex.SingleSearchResult> list = invertedIndex.search(query, exact);
 				synchronized (results) {
 					results.put(cleaned, list);
