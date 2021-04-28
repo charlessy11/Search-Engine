@@ -1,7 +1,4 @@
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Map;
@@ -14,17 +11,17 @@ import java.util.TreeSet;
  * @author Charles Sy
  *
  */
-public class QueryResultBuilder {
+public class QueryResultBuilder implements QueryResultBuilderInterface {
 	
 	/**
 	 * The inverted index to search
 	 */
-	public InvertedIndex invertedIndex;
+	private InvertedIndex invertedIndex;
 	
 	/**
 	 * Stores single search results
 	 */
-	public Map<String, Collection<InvertedIndex.SingleSearchResult>> results;
+	private Map<String, Collection<InvertedIndex.SingleSearchResult>> results;
 	
 	/**
 	 * Constructor
@@ -43,13 +40,9 @@ public class QueryResultBuilder {
 	 * @param exact to check if exact/partial search
 	 * @throws IOException if an IO error occurs
 	 */
+	@Override
 	public void parseQuery(Path path, boolean exact) throws IOException {
-		try (BufferedReader read = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
-			String line;
-			while ((line = read.readLine()) != null) {
-				parseQuery(line, exact);
-			}
-		}
+		QueryResultBuilderInterface.super.parseQuery(path, exact);
 	}
 	
 	/**
@@ -58,6 +51,7 @@ public class QueryResultBuilder {
 	 * @param line the line to be cleaned and parsed
 	 * @param exact the flag that determines what type of search to perform
 	 */
+	@Override
 	public void parseQuery(String line, boolean exact) {
 		TreeSet<String> set = TextFileStemmer.uniqueStems(line);
 		if (!set.isEmpty()) {
@@ -74,6 +68,7 @@ public class QueryResultBuilder {
 	 * @param path the path given by user or default path if otherwise
 	 * @throws IOException if an IO error occurs
 	 */
+	@Override
 	public void toJsonNestedResult(Path path) throws IOException {
 		SimpleJsonWriter.asNestedResult(results, path);
 	}

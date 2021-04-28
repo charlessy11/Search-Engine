@@ -308,9 +308,7 @@ public class InvertedIndex {
 		}
 		// merge word count
 		for (String location : other.wordCount.keySet()) {
-			// TODO Use merge, keep only the max
-			int count = other.wordCount.get(location) + this.wordCount.getOrDefault(location, 0);
-			this.wordCount.put(location, count);
+			wordCount.merge(location, other.wordCount.get(location), Integer::max);
 		}
 	}
 

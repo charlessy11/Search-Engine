@@ -1,10 +1,12 @@
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 /*
- * TODO Create a shared INTERFACE have both classes implement that interface
  * 
  * Move the parseQuery(Path, boolean) implementation as a default method in the interface
  * QueryResultBuilderInterface.super.parseQuery(path, exact);
@@ -19,12 +21,22 @@ import java.util.TreeSet;
  * @author Charles Sy
  *
  */
-public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
+public class MultithreadedQueryResultBuilder implements QueryResultBuilderInterface {
 
 	/**
 	 * The work queue for multithreading
 	 */
 	private final WorkQueue queue;
+	
+	/**
+	 * The thread-safe inverted index to search
+	 */
+	private final ConcurrentInvertedIndex invertedIndex;
+	
+	/**
+	 * Stores single search results
+	 */
+	private Map<String, Collection<InvertedIndex.SingleSearchResult>> results;
 	
 	/**
 	 * Constructor
@@ -33,13 +45,14 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 	 * @param queue the work queue for multithreading
 	 */
 	public MultithreadedQueryResultBuilder(ConcurrentInvertedIndex invertedIndex, WorkQueue queue) {
-		super(invertedIndex);
 		this.queue = queue;
+		this.invertedIndex = invertedIndex;
+		this.results = new TreeMap<>();
 	}
 	
 	@Override
 	public void parseQuery(Path path, boolean exact) throws IOException {
-		super.parseQuery(path, exact);
+		QueryResultBuilderInterface.super.parseQuery(path, exact);
 		try {
 			queue.finish();
 		} catch (InterruptedException e) {
@@ -54,7 +67,9 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 	
 	@Override
 	public void toJsonNestedResult(Path path) throws IOException {
-		super.toJsonNestedResult(path); // TODO Not synchronized 
+		synchronized (results) {
+			SimpleJsonWriter.asNestedResult(results, path);
+		}
 	}
 	
 	/**
@@ -89,14 +104,11 @@ public class MultithreadedQueryResultBuilder extends QueryResultBuilder{
 			TreeSet<String> query = TextFileStemmer.uniqueStems(line);
 			if (!query.isEmpty()) {
 				String cleaned = String.join(" ", query);
-				/* TODO 
 				synchronized (results) {
 					if (results.containsKey(cleaned)) {
 						return;
 					}
 				}
-				*/
-				
 				List<InvertedIndex.SingleSearchResult> list = invertedIndex.search(query, exact);
 				synchronized (results) {
 					results.put(cleaned, list);

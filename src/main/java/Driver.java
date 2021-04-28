@@ -26,10 +26,9 @@ public class Driver {
 		ArgumentMap map = new ArgumentMap(args); //parses command-line arguments
 		InvertedIndex invertedIndex;
 		InvertedIndexBuilder indexBuilder;
-		QueryResultBuilder resultBuilder;
+		QueryResultBuilderInterface resultBuilder;
 		
 		int workerThreads = 0;
-		ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex(); // TODO Remove from here
 		WorkQueue queue = null;
 		
 		//perform multithreading
@@ -48,7 +47,7 @@ public class Driver {
 			}
 			//initialize workQueue to num of worker threads
 			queue = new WorkQueue(workerThreads);
-			// TODO Move here instead: ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
+			ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
 			//initialize invertedIndex to use thread safe version
 			invertedIndex = threadSafe;
 			//initialize inverted index builder to use thread safe version and work queue
