@@ -12,16 +12,15 @@ import java.util.TreeSet;
  *
  */
 public class QueryResultBuilder implements QueryResultBuilderInterface {
-	// TODO final on both members
 	/**
 	 * The inverted index to search
 	 */
-	private InvertedIndex invertedIndex;
+	private final InvertedIndex invertedIndex;
 	
 	/**
 	 * Stores single search results
 	 */
-	private Map<String, Collection<InvertedIndex.SingleSearchResult>> results;
+	private final Map<String, Collection<InvertedIndex.SingleSearchResult>> results;
 	
 	/**
 	 * Constructor
@@ -31,19 +30,6 @@ public class QueryResultBuilder implements QueryResultBuilderInterface {
 	public QueryResultBuilder(InvertedIndex invertedIndex) {
 		this.invertedIndex = invertedIndex;
 		this.results = new TreeMap<>();
-	}
-	
-	// TODO Just remove, it will be inherited automatically
-	/**
-	 * Opens and reads file line by line then cleans, parses and sorts each query line
-	 * 
-	 * @param path the path of the file
-	 * @param exact to check if exact/partial search
-	 * @throws IOException if an IO error occurs
-	 */
-	@Override
-	public void parseQuery(Path path, boolean exact) throws IOException {
-		QueryResultBuilderInterface.super.parseQuery(path, exact);
 	}
 	
 	/**

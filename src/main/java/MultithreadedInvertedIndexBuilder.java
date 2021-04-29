@@ -1,4 +1,5 @@
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Path;
 
 /**
@@ -74,7 +75,7 @@ public class MultithreadedInvertedIndexBuilder extends InvertedIndexBuilder {
 			try {
 				InvertedIndexBuilder.addData(path, local);
 			} catch (IOException e) {
-				e.printStackTrace(); // TODO Log, throw UncheckedIOException, or something other than a stack trace!
+				throw new UncheckedIOException(e);
 			}
 			//add new data to inverted index
 			invertedIndex.addAll(local);
