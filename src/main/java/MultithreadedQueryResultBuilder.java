@@ -33,6 +33,7 @@ public class MultithreadedQueryResultBuilder implements QueryResultBuilderInterf
 	 */
 	private final ConcurrentInvertedIndex invertedIndex;
 	
+	// TODO final
 	/**
 	 * Stores single search results
 	 */
