@@ -12,7 +12,7 @@ import java.util.TreeSet;
  *
  */
 public class QueryResultBuilder implements QueryResultBuilderInterface {
-	
+	// TODO final on both members
 	/**
 	 * The inverted index to search
 	 */
@@ -33,6 +33,7 @@ public class QueryResultBuilder implements QueryResultBuilderInterface {
 		this.results = new TreeMap<>();
 	}
 	
+	// TODO Just remove, it will be inherited automatically
 	/**
 	 * Opens and reads file line by line then cleans, parses and sorts each query line
 	 * 

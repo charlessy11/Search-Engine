@@ -74,7 +74,7 @@ public class MultithreadedInvertedIndexBuilder extends InvertedIndexBuilder {
 			try {
 				InvertedIndexBuilder.addData(path, local);
 			} catch (IOException e) {
-				e.printStackTrace();
+				e.printStackTrace(); // TODO Log, throw UncheckedIOException, or something other than a stack trace!
 			}
 			//add new data to inverted index
 			invertedIndex.addAll(local);
