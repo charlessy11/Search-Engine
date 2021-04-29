@@ -4,6 +4,10 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.TreeSet;
 
+import opennlp.tools.stemmer.Stemmer;
+import opennlp.tools.stemmer.snowball.SnowballStemmer;
+import opennlp.tools.stemmer.snowball.SnowballStemmer.ALGORITHM;
+
 /**
  * @author Charles Sy
  *
@@ -45,9 +49,9 @@ public class WebCrawler {
 		}
 	}
 	
-	public void buildData(URL url) throws IOException {
+	public void buildData(String html, URL url) throws IOException {
 		//creates first task, gives it to the work queue, and increments pending
-		queue.execute(new Task(url));
+		queue.execute(new Task(html, url));
 	}
 	
 	private class Task implements Runnable {
@@ -62,13 +66,21 @@ public class WebCrawler {
 
 		@Override
 		public void run() {
+			InvertedIndex local = new InvertedIndex();
 			//remove any HTML unnecessary comments and block elements
 			String stripped = HtmlCleaner.stripBlockElements(html);
 			//parses remaining URLs and add to the list
 			ArrayList<URL> list = LinkParser.getValidLinks(url, stripped);
 			//remove remaining HTML tags and certain block elements from the provided text
 			String cleaned = HtmlCleaner.stripHtml(stripped);
-//			TreeSet<String> query = TextFileStemmer.uniqueStems(cleaned);
+			
+			int counter = 1; //position start at index 1
+			Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
+			for (String word : TextParser.parse(cleaned)) {
+				local.add(stemmer.stem(word).toString(), url.toString(), counter);
+			}
+			
+			invertedIndex.addAll(local);
 			
 		}
 		
