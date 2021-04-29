@@ -62,27 +62,4 @@ public class LinkParser {
 		
 		return output;
 	}
-	
-	/**
-	 * Demonstrates this class.
-	 * @param args unused
-	 * @throws Exception if any issues occur
-	 */
-	public static void main(String[] args) throws Exception {
-		// this demonstrates cleaning
-		URL valid = new URL("https://docs.python.org/3/library/functions.html?highlight=string#format");
-		System.out.println(" Link: " + valid);
-		System.out.println("Clean: " + normalize(valid));
-		System.out.println();
-
-		// this demonstrates encoding
-		URL space = new URL("https://www.google.com/search?q=hello world");
-		System.out.println(" Link: " + space);
-		System.out.println("Clean: " + normalize(space));
-		System.out.println();
-
-		// this throws an exception
-		URL invalid = new URL("javascript:alert('Hello!');");
-		System.out.println(invalid);
-	}
 }
