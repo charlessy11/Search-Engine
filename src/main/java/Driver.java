@@ -1,4 +1,6 @@
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
@@ -30,16 +32,24 @@ public class Driver {
 		
 		int workerThreads = 0;
 		WorkQueue queue = null;
+		ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
+		
+		URL seed = null;
+		int total = 1;
 		
 		//perform multithreading
-		if (map.hasFlag("-threads")) {
+		if (map.hasFlag("-threads") || map.hasFlag("-html")) {
 			try {
-				//invalid num of worker threads provided
-				if ((map.hasValue("-threads") && map.getInteger("-threads") <= 0)) {
+				if (map.hasFlag("-html")) {
 					workerThreads = 5; //default value
 				} else {
-					//set worker threads to value or 5 as default value
-					workerThreads = map.getInteger("-threads", 5);
+					//invalid num of worker threads provided
+					if ((map.hasValue("-threads") && map.getInteger("-threads") <= 0)) {
+						workerThreads = 5; //default value
+					} else {
+						//set worker threads to value or 5 as default value
+						workerThreads = map.getInteger("-threads", 5);
+					}
 				}
 			} catch (NumberFormatException e) {
 				System.out.println("Error: Unable to perform multithreading.");
@@ -47,7 +57,6 @@ public class Driver {
 			}
 			//initialize workQueue to num of worker threads
 			queue = new WorkQueue(workerThreads);
-			ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
 			//initialize invertedIndex to use thread safe version
 			invertedIndex = threadSafe;
 			//initialize inverted index builder to use thread safe version and work queue
@@ -60,6 +69,27 @@ public class Driver {
 			invertedIndex = new InvertedIndex();
 			indexBuilder = new InvertedIndexBuilder(invertedIndex);
 			resultBuilder = new QueryResultBuilder(invertedIndex);
+		}
+		
+		if (map.hasFlag("-html")) {
+			try {
+				seed = new URL(map.getString("-html"));
+				//optional flag
+				if (map.hasFlag("-max")) {
+					total = map.getInteger("-max", 1);
+				}
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			} catch (NumberFormatException e) {
+				total = 1;
+			}
+			WebCrawler crawler = new WebCrawler(queue, threadSafe);
+			try {
+				crawler.build(seed, total);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		
 		//check whether "-text path" flag, value pair exists
@@ -115,7 +145,7 @@ public class Driver {
 				resultBuilder.toJsonNestedResult(map.getPath("-results", Path.of("results.json")));
 			} catch (IOException e) {
 				System.out.println("Warning: No output file produced of search results but still performed the search operation..");
-			}
+			} 
 		}
 		
 		if (queue != null) { 
