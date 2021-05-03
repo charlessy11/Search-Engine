@@ -87,7 +87,6 @@ public class Driver {
 			try {
 				crawler.build(seed, total);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

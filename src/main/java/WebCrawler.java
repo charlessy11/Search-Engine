@@ -22,6 +22,9 @@ public class WebCrawler {
 	 */
 	private final ConcurrentInvertedIndex invertedIndex;
 	
+//	private final ArrayList<URL> list;
+	
+	private final HashSet<URL> check;
 	/**
 	 * Constructor
 	 * 
@@ -31,6 +34,8 @@ public class WebCrawler {
 	public WebCrawler(WorkQueue queue, ConcurrentInvertedIndex invertedIndex) {
 		this.queue = queue;
 		this.invertedIndex = invertedIndex;
+//		this.list = new ArrayList<>();
+		this.check = new HashSet<>();
 	}
 	
 	/**
@@ -41,28 +46,9 @@ public class WebCrawler {
 	 * @throws IOException if an IO error occurs
 	 */
 	public void build(URL url, int max) throws IOException {
-		ArrayList<URL> list = new ArrayList<URL>();
-		HashSet<String> check = new HashSet<String>();
+		check.add(url);
 		
-		list.add(url);
-		check.add(url.toString());
-		
-		for (int i = 0; i < list.size() && i < max; i++) {
-			URL current = list.get(i);
-			String html = HtmlFetcher.fetch(current, 3);
-			if (html == null) {
-				continue;
-			}
-			html = HtmlCleaner.stripBlockElements(html); 
-			queue.execute(new Task(html, current));
-			ArrayList<URL> temp = LinkParser.getValidLinks(current, html);
-			for (URL found : temp) {
-				if (!check.contains(found.toString())) {
-					list.add(found);
-					check.add(found.toString());
-				}
-			}
-		}
+		queue.execute(new Task(url, max));
 		
 		try {
 			queue.finish();
@@ -70,18 +56,6 @@ public class WebCrawler {
 			Thread.currentThread().interrupt();
 		}
 	}
-	
-	/**
-	 * The method that allows the queue to execute.
-	 * 
-	 * @param html the HTML to clean
-	 * @param url the URL to process
-	 * @throws IOException if an IO error occurs
-	 */
-//	public void buildData(String html, URL url) throws IOException {
-//		//creates first task, gives it to the work queue, and increments pending
-////		queue.execute(new Task(html, url));
-//	}
 	
 	/**
 	 * The non-static task class that provides functionality to threads in the runnable state.
@@ -93,12 +67,14 @@ public class WebCrawler {
 		/**
 		 * The HTML to clean
 		 */
-		private final String html;
+//		private final String html;
 		
 		/**
 		 * The URL the URL to process
 		 */
 		private final URL url;
+		
+		private final int max;
 		
 		/**
 		 * Constructor
@@ -106,26 +82,47 @@ public class WebCrawler {
 		 * @param html the HTML to clean
 		 * @param url the URL to process
 		 */
-		public Task(String html, URL url) {
-			this.html = html;
+		public Task(URL url, int max) {
+//			this.html = html;
 			this.url = url;
+			this.max = max;
 		}
 
 		@Override
 		public void run() {
-			InvertedIndex local = new InvertedIndex();
+			for (int i = 0; i < max; i++) {
+				String html = HtmlFetcher.fetch(url, 3);
+//				System.out.println(html);
+//				if (fetched == null) {
+//					continue;
+//				}
+				html = HtmlCleaner.stripBlockElements(html); 
+//				System.out.println(html);
 
-			//remove remaining HTML tags and certain block elements from the provided text
-			String cleaned = HtmlCleaner.stripHtml(html);
-			
-			int counter = 1; //position start at index 1
-			Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
-			for (String word : TextParser.parse(cleaned)) {
-				local.add(stemmer.stem(word).toString(), url.toString(), counter);
-				counter++;
+				for (URL found : LinkParser.getValidLinks(url, html)) {
+					synchronized(check) {
+						if (!check.contains(found)) {
+//							synchronized(check) {
+							check.add(found);
+							queue.execute(new Task(found, max - 1));
+//							}
+						}
+					}
+				}
+				//remove remaining HTML tags and certain block elements from the provided text
+				String cleaned = HtmlCleaner.stripHtml(html);
+//				System.out.println(cleaned);
+				
+				InvertedIndex local = new InvertedIndex();
+				int counter = 1; //position start at index 1
+				Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
+				for (String word : TextParser.parse(cleaned)) {
+					local.add(stemmer.stem(word).toString(), url.toString(), counter);
+					counter++;
+				}
+				
+				invertedIndex.addAll(local);
 			}
-			
-			invertedIndex.addAll(local);
 			
 		}
 		
