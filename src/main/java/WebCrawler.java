@@ -1,6 +1,5 @@
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.HashSet;
 
 import opennlp.tools.stemmer.Stemmer;
@@ -21,8 +20,6 @@ public class WebCrawler {
 	 * The thread safe inverted index
 	 */
 	private final ConcurrentInvertedIndex invertedIndex;
-	
-//	private final ArrayList<URL> list;
 	
 	private final HashSet<URL> check;
 	
@@ -73,12 +70,9 @@ public class WebCrawler {
 		 */
 		private final URL url;
 		
-//		private int max;
-		
 		/**
 		 * Constructor
 		 * 
-		 * @param html the HTML to clean
 		 * @param url the URL to process
 		 */
 		public Task(URL url) {

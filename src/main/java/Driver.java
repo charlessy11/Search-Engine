@@ -29,19 +29,20 @@ public class Driver {
 		InvertedIndex invertedIndex;
 		InvertedIndexBuilder indexBuilder;
 		QueryResultBuilderInterface resultBuilder;
+		WebCrawler crawler;
 		
 		int workerThreads = 0;
 		WorkQueue queue = null;
-		ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
+//		ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
 		
 		URL seed = null;
 		int total = 0;
 		
 		//perform multithreading
-		if (map.hasFlag("-threads") || map.hasFlag("-html")) {
+		if (map.hasFlag("-html")) {
 			try {
-				if (map.hasFlag("-html")) {
-					workerThreads = 5; //default value
+				if (map.hasFlag("-html") && map.hasFlag("-threads")) {
+					workerThreads = map.getInteger("-threads", 5);
 				} else {
 					//invalid num of worker threads provided
 					if ((map.hasValue("-threads") && map.getInteger("-threads") <= 0)) {
@@ -52,11 +53,30 @@ public class Driver {
 					}
 				}
 			} catch (NumberFormatException e) {
-				System.out.println("Error: Unable to perform multithreading.");
+				System.out.println("Warning: Invalid input for amount of worker threads.");
 				workerThreads = 5;
+			}
+			try {
+				seed = new URL(map.getString("-html"));
+				//optional flag
+				if (map.hasFlag("-max")) {
+					total = map.getInteger("-max", 1);
+				}
+			} catch (MalformedURLException e) {
+				e.printStackTrace();
+			} catch (NumberFormatException e) {
+				System.out.println("Warning: Invalid input for total number of URLs to crawl.");
+				total = 1;
 			}
 			//initialize workQueue to num of worker threads
 			queue = new WorkQueue(workerThreads);
+			ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
+			crawler = new WebCrawler(queue, threadSafe);
+			try {
+				crawler.build(seed, total);
+			} catch (IOException e) {
+				System.out.println("Error: Unable to crawl the web.");
+			}
 			//initialize invertedIndex to use thread safe version
 			invertedIndex = threadSafe;
 			//initialize inverted index builder to use thread safe version and work queue
@@ -71,26 +91,26 @@ public class Driver {
 			resultBuilder = new QueryResultBuilder(invertedIndex);
 		}
 		
-		if (map.hasFlag("-html")) {
-			try {
-				seed = new URL(map.getString("-html"));
-				//optional flag
-				if (map.hasFlag("-max")) {
-					total = map.getInteger("-max", 1);
-				}
-			} catch (MalformedURLException e) {
-				e.printStackTrace();
-			} catch (NumberFormatException e) {
-				System.out.println("Warning: Invalid input for total number of URLs to crawl.");
-				total = 1;
-			}
-			WebCrawler crawler = new WebCrawler(queue, threadSafe);
-			try {
-				crawler.build(seed, total);
-			} catch (IOException e) {
-				System.out.println("Error: Unable to crawl the web.");
-			}
-		}
+//		if (map.hasFlag("-html")) {
+//			try {
+//				seed = new URL(map.getString("-html"));
+//				//optional flag
+//				if (map.hasFlag("-max")) {
+//					total = map.getInteger("-max", 1);
+//				}
+//			} catch (MalformedURLException e) {
+//				e.printStackTrace();
+//			} catch (NumberFormatException e) {
+//				System.out.println("Warning: Invalid input for total number of URLs to crawl.");
+//				total = 1;
+//			}
+////			WebCrawler crawler = new WebCrawler(queue, threadSafe);
+//			try {
+//				crawler.build(seed, total);
+//			} catch (IOException e) {
+//				System.out.println("Error: Unable to crawl the web.");
+//			}
+//		}
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
