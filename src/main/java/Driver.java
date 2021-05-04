@@ -35,7 +35,7 @@ public class Driver {
 		ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
 		
 		URL seed = null;
-		int total = 1;
+		int total = 0;
 		
 		//perform multithreading
 		if (map.hasFlag("-threads") || map.hasFlag("-html")) {
@@ -81,13 +81,14 @@ public class Driver {
 			} catch (MalformedURLException e) {
 				e.printStackTrace();
 			} catch (NumberFormatException e) {
+				System.out.println("Warning: Invalid input for total number of URLs to crawl.");
 				total = 1;
 			}
 			WebCrawler crawler = new WebCrawler(queue, threadSafe);
 			try {
 				crawler.build(seed, total);
 			} catch (IOException e) {
-				e.printStackTrace();
+				System.out.println("Error: Unable to crawl the web.");
 			}
 		}
 		

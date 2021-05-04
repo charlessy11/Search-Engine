@@ -25,6 +25,8 @@ public class WebCrawler {
 //	private final ArrayList<URL> list;
 	
 	private final HashSet<URL> check;
+	
+	private int max;
 	/**
 	 * Constructor
 	 * 
@@ -34,8 +36,8 @@ public class WebCrawler {
 	public WebCrawler(WorkQueue queue, ConcurrentInvertedIndex invertedIndex) {
 		this.queue = queue;
 		this.invertedIndex = invertedIndex;
-//		this.list = new ArrayList<>();
 		this.check = new HashSet<>();
+		this.max = 0;
 	}
 	
 	/**
@@ -46,9 +48,10 @@ public class WebCrawler {
 	 * @throws IOException if an IO error occurs
 	 */
 	public void build(URL url, int max) throws IOException {
+		this.max = max;
 		check.add(url);
 		
-		queue.execute(new Task(url, max));
+		queue.execute(new Task(url));
 		
 		try {
 			queue.finish();
@@ -64,17 +67,13 @@ public class WebCrawler {
 	 *
 	 */
 	private class Task implements Runnable {
-		/**
-		 * The HTML to clean
-		 */
-//		private final String html;
 		
 		/**
 		 * The URL the URL to process
 		 */
 		private final URL url;
 		
-		private final int max;
+//		private int max;
 		
 		/**
 		 * Constructor
@@ -82,37 +81,27 @@ public class WebCrawler {
 		 * @param html the HTML to clean
 		 * @param url the URL to process
 		 */
-		public Task(URL url, int max) {
-//			this.html = html;
+		public Task(URL url) {
 			this.url = url;
-			this.max = max;
 		}
 
 		@Override
 		public void run() {
-			for (int i = 0; i < max; i++) {
 				String html = HtmlFetcher.fetch(url, 3);
-//				System.out.println(html);
-//				if (fetched == null) {
-//					continue;
-//				}
+				//remove any HTML comments and block elements that should not be considered for parsing links
 				html = HtmlCleaner.stripBlockElements(html); 
-//				System.out.println(html);
-
-				for (URL found : LinkParser.getValidLinks(url, html)) {
-					synchronized(check) {
-						if (!check.contains(found)) {
-//							synchronized(check) {
+				//gets each valid URL
+				synchronized(check) {
+					for (URL found : LinkParser.getValidLinks(url, html)) {
+						if (check.size() < max && !check.contains(found)) {
 							check.add(found);
-							queue.execute(new Task(found, max - 1));
-//							}
+							queue.execute(new Task(found));
 						}
 					}
 				}
 				//remove remaining HTML tags and certain block elements from the provided text
 				String cleaned = HtmlCleaner.stripHtml(html);
-//				System.out.println(cleaned);
-				
+				//Clean, parse, and stem the resulting text to populate the inverted index 
 				InvertedIndex local = new InvertedIndex();
 				int counter = 1; //position start at index 1
 				Stemmer stemmer = new SnowballStemmer(ALGORITHM.ENGLISH);
@@ -122,8 +111,7 @@ public class WebCrawler {
 				}
 				
 				invertedIndex.addAll(local);
-			}
-			
+
 		}
 		
 	}
