@@ -21,9 +21,16 @@ public class WebCrawler {
 	 */
 	private final ConcurrentInvertedIndex invertedIndex;
 	
+	/**
+	 * The set that keeps track of URLs being processed
+	 */
 	private final HashSet<URL> check;
 	
+	/**
+	 * The maximum limit of URLs to crawl
+	 */
 	private int max;
+	
 	/**
 	 * Constructor
 	 * 
@@ -66,7 +73,7 @@ public class WebCrawler {
 	private class Task implements Runnable {
 		
 		/**
-		 * The URL the URL to process
+		 * The URL to process
 		 */
 		private final URL url;
 		
@@ -103,10 +110,7 @@ public class WebCrawler {
 					local.add(stemmer.stem(word).toString(), url.toString(), counter);
 					counter++;
 				}
-				
 				invertedIndex.addAll(local);
-
 		}
-		
 	}
 }
