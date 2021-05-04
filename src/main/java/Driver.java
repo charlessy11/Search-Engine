@@ -41,17 +41,12 @@ public class Driver {
 		//perform multithreading
 		if (map.hasFlag("-html")) {
 			try {
-				if (map.hasFlag("-html") && map.hasFlag("-threads")) {
+				if (map.hasFlag("-threads")) {
 					workerThreads = map.getInteger("-threads", 5);
-				} else {
-					//invalid num of worker threads provided
-					if ((map.hasValue("-threads") && map.getInteger("-threads") <= 0)) {
+					if (workerThreads <= 0) {
 						workerThreads = 5; //default value
-					} else {
-						//set worker threads to value or 5 as default value
-						workerThreads = map.getInteger("-threads", 5);
 					}
-				}
+				} 
 			} catch (NumberFormatException e) {
 				System.out.println("Warning: Invalid input for amount of worker threads.");
 				workerThreads = 5;
@@ -63,7 +58,7 @@ public class Driver {
 					total = map.getInteger("-max", 1);
 				}
 			} catch (MalformedURLException e) {
-				e.printStackTrace();
+				System.out.println("Warning: A malformed URL has occured.");
 			} catch (NumberFormatException e) {
 				System.out.println("Warning: Invalid input for total number of URLs to crawl.");
 				total = 1;
@@ -104,7 +99,7 @@ public class Driver {
 //				System.out.println("Warning: Invalid input for total number of URLs to crawl.");
 //				total = 1;
 //			}
-////			WebCrawler crawler = new WebCrawler(queue, threadSafe);
+//			crawler = new WebCrawler(queue, threadSafe);
 //			try {
 //				crawler.build(seed, total);
 //			} catch (IOException e) {
