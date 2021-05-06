@@ -33,7 +33,6 @@ public class Driver {
 		
 		int workerThreads = 0;
 		WorkQueue queue = null;
-//		ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
 		
 		URL seed = null;
 		int total = 0;
@@ -85,27 +84,6 @@ public class Driver {
 			indexBuilder = new InvertedIndexBuilder(invertedIndex);
 			resultBuilder = new QueryResultBuilder(invertedIndex);
 		}
-		
-//		if (map.hasFlag("-html")) {
-//			try {
-//				seed = new URL(map.getString("-html"));
-//				//optional flag
-//				if (map.hasFlag("-max")) {
-//					total = map.getInteger("-max", 1);
-//				}
-//			} catch (MalformedURLException e) {
-//				e.printStackTrace();
-//			} catch (NumberFormatException e) {
-//				System.out.println("Warning: Invalid input for total number of URLs to crawl.");
-//				total = 1;
-//			}
-//			crawler = new WebCrawler(queue, threadSafe);
-//			try {
-//				crawler.build(seed, total);
-//			} catch (IOException e) {
-//				System.out.println("Error: Unable to crawl the web.");
-//			}
-//		}
 		
 		//check whether "-text path" flag, value pair exists
 		if (map.hasFlag("-text") && map.hasValue("-text")) {
