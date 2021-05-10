@@ -5,6 +5,13 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+
 /**
  * Class responsible for running this project based on the provided command-line
  * arguments. See the README for details.
@@ -33,6 +40,7 @@ public class Driver {
 		
 		int workerThreads = 0;
 		WorkQueue queue = null;
+		ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
 		
 		URL seed = null;
 		int total = 0;
@@ -64,7 +72,7 @@ public class Driver {
 			}
 			//initialize workQueue to num of worker threads
 			queue = new WorkQueue(workerThreads);
-			ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
+//			ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
 			crawler = new WebCrawler(queue, threadSafe);
 			try {
 				crawler.build(seed, total);
@@ -83,6 +91,7 @@ public class Driver {
 			invertedIndex = new InvertedIndex();
 			indexBuilder = new InvertedIndexBuilder(invertedIndex);
 			resultBuilder = new QueryResultBuilder(invertedIndex);
+			crawler = new WebCrawler(queue, threadSafe);
 		}
 		
 		//check whether "-text path" flag, value pair exists
@@ -139,6 +148,47 @@ public class Driver {
 			} catch (IOException e) {
 				System.out.println("Warning: No output file produced of search results but still performed the search operation..");
 			} 
+		}
+		
+		
+		int port;
+		//indicates a search engine web server should be launched 
+		if (map.hasFlag("-server")) {
+			try {
+				port = map.getInteger("-server", 8080);
+			} catch (NumberFormatException e) {
+				System.out.println("Warning: Invalid Port Number.");
+				port = 8080;
+			}
+			
+			try {
+				Server server = new Server(port);
+//				
+//				ServletContextHandler servletContextHandler = null;
+//				
+//				servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+//				servletContextHandler.setContextPath("/servlets");
+//
+//				DefaultHandler defaultHandler = new DefaultHandler();
+//				defaultHandler.setServeIcon(true);
+//
+//				ContextHandler contextHandler = new ContextHandler("/favicon.ico");
+//				contextHandler.setHandler(defaultHandler);
+
+				SearchServlet searchServlet = new SearchServlet(resultBuilder, invertedIndex, indexBuilder, crawler);
+				ServletHolder servletHolder = new ServletHolder(searchServlet);
+
+				ServletHandler servletHandler = new ServletHandler();
+				servletHandler.addServletWithMapping(servletHolder, "/");
+
+
+				server.setHandler(servletHandler);
+				server.start();
+				server.join();
+
+			} catch (Exception e) {
+				System.out.println("Jetty server failed because " + e.getMessage());
+			}
 		}
 		
 		if (queue != null) { 
