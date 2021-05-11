@@ -45,11 +45,9 @@ public class Driver {
 		//perform multithreading
 		if (map.hasFlag("-html") || map.hasFlag("-threads")) {
 			try {
-				if (map.hasFlag("-threads")) {
-					workerThreads = map.getInteger("-threads", 5);
-					if (workerThreads <= 0) {
-						workerThreads = 5; //default value
-					}
+				workerThreads = map.getInteger("-threads", 5);
+				if (workerThreads <= 0) {
+					workerThreads = 5; //default value
 				} 
 			} catch (NumberFormatException e) {
 				System.out.println("Warning: Invalid input for amount of worker threads.");
