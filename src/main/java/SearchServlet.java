@@ -116,16 +116,11 @@ public class SearchServlet extends HttpServlet {
 		String formatString;
 
 		if (message != null) {
-//			message = "";
-//		} else {
 			response.getWriter();
 			
 			SnowballStemmer stemmer = new SnowballStemmer(DEFAULT);
 			Set<String> queryList = new HashSet<String>();
 			for (String word : message.split(" ")) {
-//				if (part == " ") {
-//					part = "";
-//				}
 				System.out.println("Word: " + word);
 				queryList.add((stemmer.stem(word.toLowerCase())).toString());
 //				System.out.println("List: " + queryList);
