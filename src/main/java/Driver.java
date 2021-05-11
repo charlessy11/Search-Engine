@@ -6,9 +6,6 @@ import java.time.Duration;
 import java.time.Instant;
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.ContextHandler;
-import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
@@ -46,7 +43,7 @@ public class Driver {
 		int total = 0;
 		
 		//perform multithreading
-		if (map.hasFlag("-html")) {
+		if (map.hasFlag("-html") || map.hasFlag("-threads")) {
 			try {
 				if (map.hasFlag("-threads")) {
 					workerThreads = map.getInteger("-threads", 5);
@@ -58,11 +55,23 @@ public class Driver {
 				System.out.println("Warning: Invalid input for amount of worker threads.");
 				workerThreads = 5;
 			}
+			//initialize workQueue to num of worker threads
+			queue = new WorkQueue(workerThreads);
 			try {
-				seed = new URL(map.getString("-html"));
-				//optional flag
-				if (map.hasFlag("-max")) {
-					total = map.getInteger("-max", 1);
+				if (map.hasFlag("-html")) {
+					seed = new URL(map.getString("-html"));
+					//optional flag
+					if (map.hasFlag("-max")) {
+						total = map.getInteger("-max", 1);
+					}
+					crawler = new WebCrawler(queue, threadSafe);
+					try {
+						System.out.println("BEFORE BUILD");
+						crawler.build(seed, total);
+						System.out.println("AFTER BUILD");
+					} catch (IOException e) {
+						System.out.println("Error: Unable to crawl the web.");
+					}
 				}
 			} catch (MalformedURLException e) {
 				System.out.println("Warning: A malformed URL has occured.");
@@ -70,15 +79,14 @@ public class Driver {
 				System.out.println("Warning: Invalid input for total number of URLs to crawl.");
 				total = 1;
 			}
-			//initialize workQueue to num of worker threads
-			queue = new WorkQueue(workerThreads);
 //			ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
-			crawler = new WebCrawler(queue, threadSafe);
-			try {
-				crawler.build(seed, total);
-			} catch (IOException e) {
-				System.out.println("Error: Unable to crawl the web.");
-			}
+//			queue = new WorkQueue(workerThreads);
+//			crawler = new WebCrawler(queue, threadSafe);
+//			try {
+//				crawler.build(seed, total);
+//			} catch (IOException e) {
+//				System.out.println("Error: Unable to crawl the web.");
+//			}
 			//initialize invertedIndex to use thread safe version
 			invertedIndex = threadSafe;
 			//initialize inverted index builder to use thread safe version and work queue
@@ -91,7 +99,49 @@ public class Driver {
 			invertedIndex = new InvertedIndex();
 			indexBuilder = new InvertedIndexBuilder(invertedIndex);
 			resultBuilder = new QueryResultBuilder(invertedIndex);
-			crawler = new WebCrawler(queue, threadSafe);
+//			crawler = new WebCrawler(queue, threadSafe);
+		}
+		
+		int port;
+		System.out.println("ENTERING SERVER");
+		//indicates a search engine web server should be launched 
+		if (map.hasFlag("-server")) {
+			try {
+				port = map.getInteger("-server", 8080);
+			} catch (NumberFormatException e) {
+				System.out.println("Warning: Invalid Port Number.");
+				port = 8080;
+			}
+			Server server = new Server(port);
+			try {
+//				Server server = new Server(port);
+//				
+//				ServletContextHandler servletContextHandler = null;
+//				
+//				servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
+//				servletContextHandler.setContextPath("/servlets");
+//
+//				DefaultHandler defaultHandler = new DefaultHandler();
+//				defaultHandler.setServeIcon(true);
+//
+//				ContextHandler contextHandler = new ContextHandler("/favicon.ico");
+//				contextHandler.setHandler(defaultHandler);
+
+				SearchServlet searchServlet = new SearchServlet(resultBuilder, invertedIndex, indexBuilder);
+				ServletHolder servletHolder = new ServletHolder(searchServlet);
+
+				ServletHandler servletHandler = new ServletHandler();
+				servletHandler.addServletWithMapping(servletHolder, "/test");
+
+
+				server.setHandler(servletHandler);
+				server.start();
+				System.out.println("Server started " + invertedIndex.size());
+				server.join();
+
+			} catch (Exception e) {
+				System.out.println("Jetty server failed because " + e.getMessage());
+			}
 		}
 		
 		//check whether "-text path" flag, value pair exists
@@ -148,47 +198,6 @@ public class Driver {
 			} catch (IOException e) {
 				System.out.println("Warning: No output file produced of search results but still performed the search operation..");
 			} 
-		}
-		
-		
-		int port;
-		//indicates a search engine web server should be launched 
-		if (map.hasFlag("-server")) {
-			try {
-				port = map.getInteger("-server", 8080);
-			} catch (NumberFormatException e) {
-				System.out.println("Warning: Invalid Port Number.");
-				port = 8080;
-			}
-			
-			try {
-				Server server = new Server(port);
-//				
-//				ServletContextHandler servletContextHandler = null;
-//				
-//				servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-//				servletContextHandler.setContextPath("/servlets");
-//
-//				DefaultHandler defaultHandler = new DefaultHandler();
-//				defaultHandler.setServeIcon(true);
-//
-//				ContextHandler contextHandler = new ContextHandler("/favicon.ico");
-//				contextHandler.setHandler(defaultHandler);
-
-				SearchServlet searchServlet = new SearchServlet(resultBuilder, invertedIndex, indexBuilder, crawler);
-				ServletHolder servletHolder = new ServletHolder(searchServlet);
-
-				ServletHandler servletHandler = new ServletHandler();
-				servletHandler.addServletWithMapping(servletHolder, "/");
-
-
-				server.setHandler(servletHandler);
-				server.start();
-				server.join();
-
-			} catch (Exception e) {
-				System.out.println("Jetty server failed because " + e.getMessage());
-			}
 		}
 		
 		if (queue != null) { 

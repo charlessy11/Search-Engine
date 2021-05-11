@@ -43,19 +43,19 @@ public class SearchServlet extends HttpServlet {
 
 	private QueryResultBuilderInterface queryBuilder;
 	
-	private WebCrawler crawler;
+//	private WebCrawler crawler;
 
 	/**
 	 * @param queryBuilder
 	 * @param index
 	 */
-	public SearchServlet(QueryResultBuilderInterface queryBuilder, InvertedIndex index, InvertedIndexBuilder builder, WebCrawler crawler) {
+	public SearchServlet(QueryResultBuilderInterface queryBuilder, InvertedIndex index, InvertedIndexBuilder builder) {
 		super();
 		output = new LinkedList<>();
 		this.queryBuilder = queryBuilder;
 		this.index = index;
 		this.builder = builder;
-		this.crawler = crawler;
+//		this.crawler = crawler;
 	}
 
 	@Override
@@ -88,12 +88,16 @@ public class SearchServlet extends HttpServlet {
 		if (!output.isEmpty()) {
 			for (String message : output) {
 				out.printf("<div class=\"box\">%n" + message + "</div>%n");
+//				out.printf("CHECK");
 			}
+		} else {
+//			out.printf("<div class=\"content has-text-centered\">%n");
+			out.printf("output is empty");
 		}
-		out.printf("<footer class=\"footer\">%n");
-		out.printf("<div class=\"content has-text-centered\">%n");
-		out.printf("</div>");
-		out.printf("</footer>");
+//		out.printf("<footer class=\"footer\">%n");
+//		out.printf("<div class=\"content has-text-centered\">%n");
+//		out.printf("</div>");
+//		out.printf("</footer>");
 		out.printf("</body>");	
 		out.printf("</html>");
 		
@@ -111,39 +115,37 @@ public class SearchServlet extends HttpServlet {
 		String message = request.getParameter("search");
 		String formatString;
 
-		if (message == null) {
-			message = "";
-		} else {
+		if (message != null) {
+//			message = "";
+//		} else {
 			response.getWriter();
 			
 			SnowballStemmer stemmer = new SnowballStemmer(DEFAULT);
 			Set<String> queryList = new HashSet<String>();
-			for (String part : message.split(" ")) {
-				if (part == " ") {
-					part = "";
-				}
-				queryList.add((stemmer.stem(part.toLowerCase())).toString());
+			for (String word : message.split(" ")) {
+//				if (part == " ") {
+//					part = "";
+//				}
+				System.out.println("Word: " + word);
+				queryList.add((stemmer.stem(word.toLowerCase())).toString());
+//				System.out.println("List: " + queryList);
 			}
-			
+			System.out.println("List: " + queryList);
 			Collection<InvertedIndex.SingleSearchResult> results = this.index.partialSearch(queryList);
+			System.out.println("Results: " + results);
 			
 			if (results.isEmpty()) {
 				output.clear();
 				
-				formatString = String.format("<i class=\"fas fa-quote-left has-text-grey-light\"></i> %s <i class=\"fas fa-quote-right has-text-grey-light\"></i>%n"
-											+ "<p class=\"has-text-grey is-size-7 has-text-right\"></p>%n", "The query line " + '"' + request.getParameter("search") + '"' + " was not found.");
+				formatString = String.format("The query line " + '"' + request.getParameter("search") + '"' + " was not found.");
 				output.add(formatString);
 			} else {
 				output.clear();
 				
 				for (InvertedIndex.SingleSearchResult result : results) {
-					String score = String.format("%.3f", result.getScore());
-					formatString = String.format("<a href=\"%s\">%s</a>"
-							+ "<p class=\"has-text-grey is-size-7 has-text-right\">%s</p>%n"
-							+ "<p class=\"has-text-grey is-size-7 has-text-right\">%s</p>%n"
-							+ "<p class=\"has-text-grey is-size-7 has-text-right\">%s</p>%n",
-							result.getLocation(), result.getLocation(), "score: " + score,
-							"matches: " + result.getMatches());
+//					String score = String.format("%.3f", result.getScore());
+					formatString = String.format("<a href=\"%s\">%s</a>", result.getLocation(), result.getLocation()); 
+//												 "score: " + score, "matches: " + result.getMatches());
 					output.add(formatString);
 				}
 			}
