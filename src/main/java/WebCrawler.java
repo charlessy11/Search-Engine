@@ -64,6 +64,15 @@ public class WebCrawler {
 		}
 	}
 	
+//	public void addURL(URL url) {
+//		try {
+//			build(url, 50);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
+	
 	/**
 	 * The non-static task class that provides functionality to threads in the runnable state.
 	 * 
@@ -89,6 +98,9 @@ public class WebCrawler {
 		@Override
 		public void run() {
 				String html = HtmlFetcher.fetch(url, 3);
+				if (html == null) {
+					return;
+				}
 				//remove any HTML comments and block elements that should not be considered for parsing links
 				html = HtmlCleaner.stripBlockElements(html); 
 				//gets each valid URL

@@ -56,29 +56,30 @@ public class Driver {
 				workerThreads = 5;
 			}
 			//initialize workQueue to num of worker threads
+//			System.out.println(workerThreads);
 			queue = new WorkQueue(workerThreads);
-			try {
-				if (map.hasFlag("-html")) {
-					seed = new URL(map.getString("-html"));
-					//optional flag
-					if (map.hasFlag("-max")) {
-						total = map.getInteger("-max", 1);
-					}
-					crawler = new WebCrawler(queue, threadSafe);
-					try {
-						System.out.println("BEFORE BUILD");
-						crawler.build(seed, total);
-						System.out.println("AFTER BUILD");
-					} catch (IOException e) {
-						System.out.println("Error: Unable to crawl the web.");
-					}
-				}
-			} catch (MalformedURLException e) {
-				System.out.println("Warning: A malformed URL has occured.");
-			} catch (NumberFormatException e) {
-				System.out.println("Warning: Invalid input for total number of URLs to crawl.");
-				total = 1;
-			}
+//			try {
+//				if (map.hasFlag("-html")) {
+//					seed = new URL(map.getString("-html"));
+//					//optional flag
+//					if (map.hasFlag("-max")) {
+//						total = map.getInteger("-max", 1);
+//					}
+//					crawler = new WebCrawler(queue, threadSafe);
+//					try {
+//						System.out.println("BEFORE BUILD");
+//						crawler.build(seed, total);
+//						System.out.println("AFTER BUILD");
+//					} catch (IOException e) {
+//						System.out.println("Error: Unable to crawl the web.");
+//					}
+//				}
+//			} catch (MalformedURLException e) {
+//				System.out.println("Warning: A malformed URL has occured.");
+//			} catch (NumberFormatException e) {
+//				System.out.println("Warning: Invalid input for total number of URLs to crawl.");
+//				total = 1;
+//			}
 //			ConcurrentInvertedIndex threadSafe = new ConcurrentInvertedIndex();
 //			queue = new WorkQueue(workerThreads);
 //			crawler = new WebCrawler(queue, threadSafe);
@@ -100,6 +101,31 @@ public class Driver {
 			indexBuilder = new InvertedIndexBuilder(invertedIndex);
 			resultBuilder = new QueryResultBuilder(invertedIndex);
 //			crawler = new WebCrawler(queue, threadSafe);
+		}
+		
+		if (map.hasFlag("-html")) {
+			try {
+				seed = new URL(map.getString("-html"));
+				//optional flag
+				if (map.hasFlag("-max")) {
+					total = map.getInteger("-max", 1);
+				}
+				crawler = new WebCrawler(queue, threadSafe);
+				try {
+					System.out.println("BEFORE BUILD");
+					System.out.println("seed: " + seed);
+					System.out.println("total: " + total);
+					crawler.build(seed, total);
+					System.out.println("AFTER BUILD");
+				} catch (IOException e) {
+					System.out.println("Error: Unable to crawl the web.");
+				}
+			} catch (MalformedURLException e) {
+				System.out.println("Warning: A malformed URL has occured.");
+			} catch (NumberFormatException e) {
+				System.out.println("Warning: Invalid input for total number of URLs to crawl.");
+				total = 1;
+			}
 		}
 		
 		int port;
