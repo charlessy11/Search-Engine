@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
+import org.apache.commons.text.StringEscapeUtils;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -86,8 +88,8 @@ public class SearchServlet extends HttpServlet {
 		out.printf("Search");
 		out.printf("</button>");
 		if (!output.isEmpty()) {
-			for (String message : output) {
-				out.printf("<div class=\"box\">%n" + message + "</div>%n");
+			for (String query : output) {
+				out.printf("<div class=\"box\">" + query + "</div>");
 //				out.printf("CHECK");
 			}
 		} else {
@@ -112,15 +114,22 @@ public class SearchServlet extends HttpServlet {
 
 		response.setContentType("text/html");
 
-		String message = request.getParameter("search");
-		String formatString;
-
-		if (message != null) {
+		String query = request.getParameter("search");
+		String formatted;
+		
+		// avoid xss attacks using apache commons text
+		query = StringEscapeUtils.escapeHtml4(query);
+		
+		if (query == null) {
+			query = " ";
+		}
+		
+		if (query != null) {
 			response.getWriter();
 			
 			SnowballStemmer stemmer = new SnowballStemmer(DEFAULT);
 			Set<String> queryList = new HashSet<String>();
-			for (String word : message.split(" ")) {
+			for (String word : query.split(" ")) {
 				System.out.println("Word: " + word);
 				queryList.add((stemmer.stem(word.toLowerCase())).toString());
 //				System.out.println("List: " + queryList);
@@ -132,16 +141,16 @@ public class SearchServlet extends HttpServlet {
 			if (results.isEmpty()) {
 				output.clear();
 				
-				formatString = String.format("The query line " + '"' + request.getParameter("search") + '"' + " was not found.");
-				output.add(formatString);
+				formatted = String.format("The query line " + '"' + request.getParameter("search") + '"' + " was not found.");
+				output.add(formatted);
 			} else {
 				output.clear();
 				
 				for (InvertedIndex.SingleSearchResult result : results) {
 //					String score = String.format("%.3f", result.getScore());
-					formatString = String.format("<a href=\"%s\">%s</a>", result.getLocation(), result.getLocation()); 
+					formatted = String.format("<a href=\"%s\">%s</a>", result.getLocation(), result.getLocation()); 
 //												 "score: " + score, "matches: " + result.getMatches());
-					output.add(formatString);
+					output.add(formatted);
 				}
 			}
 		}

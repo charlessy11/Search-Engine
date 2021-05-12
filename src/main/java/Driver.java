@@ -80,11 +80,11 @@ public class Driver {
 				}
 				crawler = new WebCrawler(queue, threadSafe);
 				try {
-					System.out.println("BEFORE BUILD");
-					System.out.println("seed: " + seed);
-					System.out.println("total: " + total);
+//					System.out.println("BEFORE BUILD");
+//					System.out.println("seed: " + seed);
+//					System.out.println("total: " + total);
 					crawler.build(seed, total);
-					System.out.println("AFTER BUILD");
+//					System.out.println("AFTER BUILD");
 				} catch (IOException e) {
 					System.out.println("Error: Unable to crawl the web.");
 				}
@@ -97,7 +97,7 @@ public class Driver {
 		}
 		
 		int port;
-		System.out.println("ENTERING SERVER");
+//		System.out.println("ENTERING SERVER");
 		//indicates a search engine web server should be launched 
 		if (map.hasFlag("-server")) {
 			try {
@@ -125,7 +125,7 @@ public class Driver {
 				ServletHolder servletHolder = new ServletHolder(searchServlet);
 
 				ServletHandler servletHandler = new ServletHandler();
-				servletHandler.addServletWithMapping(servletHolder, "/test");
+				servletHandler.addServletWithMapping(servletHolder, "/search");
 
 
 				server.setHandler(servletHandler);
