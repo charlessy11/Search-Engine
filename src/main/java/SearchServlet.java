@@ -63,6 +63,7 @@ public class SearchServlet extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+//		LinkedList<String> output = new LinkedList<>();
 		response.setContentType("text/html");
 
 		PrintWriter out = response.getWriter();
@@ -86,7 +87,7 @@ public class SearchServlet extends HttpServlet {
 		out.printf("<div class=\"control\">");
 		out.printf("<button class=\"button is-primary\" onclick=\\\"clicked()\\\" name=\\\"enter\\\" type=\\\"submit\\\">");
 		out.printf("Search");
-		out.printf("</button>");
+		out.printf("</button>" + "</form>");
 		if (!output.isEmpty()) {
 			for (String query : output) {
 				out.printf("<div class=\"box\">" + query + "</div>");
@@ -111,6 +112,7 @@ public class SearchServlet extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+//		LinkedList<String> output = new LinkedList<>();
 
 		response.setContentType("text/html");
 
@@ -120,13 +122,7 @@ public class SearchServlet extends HttpServlet {
 		// avoid xss attacks using apache commons text
 		query = StringEscapeUtils.escapeHtml4(query);
 		
-		if (query == null) {
-			query = " ";
-		}
-		
-		if (query != null) {
-			response.getWriter();
-			
+		if (query != null && !query.isBlank()) {	
 			SnowballStemmer stemmer = new SnowballStemmer(DEFAULT);
 			Set<String> queryList = new HashSet<String>();
 			for (String word : query.split(" ")) {
@@ -153,6 +149,10 @@ public class SearchServlet extends HttpServlet {
 					output.add(formatted);
 				}
 			}
+		} else {
+			output.clear();
+			formatted = "Nothing was searched.";
+			output.add(formatted);
 		}
 
 		response.setStatus(HttpServletResponse.SC_OK);
