@@ -54,7 +54,6 @@ public class Driver {
 				workerThreads = 5;
 			}
 			//initialize workQueue to num of worker threads
-			System.out.println(workerThreads);
 			queue = new WorkQueue(workerThreads);
 			//initialize invertedIndex to use thread safe version
 			invertedIndex = threadSafe;
@@ -68,7 +67,6 @@ public class Driver {
 			invertedIndex = new InvertedIndex();
 			indexBuilder = new InvertedIndexBuilder(invertedIndex);
 			resultBuilder = new QueryResultBuilder(invertedIndex);
-//			crawler = new WebCrawler(queue, threadSafe);
 		}
 		
 		if (map.hasFlag("-html")) {
@@ -80,11 +78,7 @@ public class Driver {
 				}
 				crawler = new WebCrawler(queue, threadSafe);
 				try {
-//					System.out.println("BEFORE BUILD");
-//					System.out.println("seed: " + seed);
-//					System.out.println("total: " + total);
 					crawler.build(seed, total);
-//					System.out.println("AFTER BUILD");
 				} catch (IOException e) {
 					System.out.println("Error: Unable to crawl the web.");
 				}
@@ -97,7 +91,6 @@ public class Driver {
 		}
 		
 		int port;
-//		System.out.println("ENTERING SERVER");
 		//indicates a search engine web server should be launched 
 		if (map.hasFlag("-server")) {
 			try {
@@ -108,20 +101,7 @@ public class Driver {
 			}
 			Server server = new Server(port);
 			try {
-//				Server server = new Server(port);
-//				
-//				ServletContextHandler servletContextHandler = null;
-//				
-//				servletContextHandler = new ServletContextHandler(ServletContextHandler.SESSIONS);
-//				servletContextHandler.setContextPath("/servlets");
-//
-//				DefaultHandler defaultHandler = new DefaultHandler();
-//				defaultHandler.setServeIcon(true);
-//
-//				ContextHandler contextHandler = new ContextHandler("/favicon.ico");
-//				contextHandler.setHandler(defaultHandler);
-
-				SearchServlet searchServlet = new SearchServlet(resultBuilder, invertedIndex, indexBuilder);
+				SearchServlet searchServlet = new SearchServlet(invertedIndex);
 				ServletHolder servletHolder = new ServletHolder(searchServlet);
 
 				ServletHandler servletHandler = new ServletHandler();
